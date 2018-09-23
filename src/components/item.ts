@@ -3,6 +3,14 @@ import { formatMoney } from "./money"
 const template = document.createElement("template")
 
 template.innerHTML = `
+<style>
+.icon {
+  height: 36px;
+  width: 36px;
+  padding: 4px;
+  background-image: url("https://wow.zamimg.com/images/Icon/medium/border/default.png");
+}
+</style>
 <span class="quantity"></span>
 <img class="icon"></img>
 `

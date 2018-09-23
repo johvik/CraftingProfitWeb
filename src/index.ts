@@ -193,7 +193,7 @@ function updateProfit(profit: Profit, item: Element, money: Element, unknownMain
   }
 
   if (profit.crafts.auctionPrice || profit.cost.cost) {
-    money.setAttribute("copper", (profit.crafts.auctionPrice - profit.cost.cost) + "")
+    money.setAttribute("copper", ((profit.crafts.auctionPrice * profit.crafts.quantity) - profit.cost.cost) + "")
   } else {
     money.setAttribute("style", "display:none")
   }
@@ -262,16 +262,55 @@ function updateRecipes(profits: Profit[]) {
   recipesBody.appendChild(fragment)
 }
 
+function updateFilters(filters: FilterOption[]) {
+  const filterDiv = NeverNull(document.getElementById("filters"))
+  const template = (filter: FilterOption) => {
+    return `
+    <div class="control">
+      <label class="checkbox" disabled>
+        <input type="checkbox" value="${filter.key}" checked disabled>
+        ${filter.text}
+      </label>
+    </div>`
+  }
+
+  let html = template({ key: "all", text: "Select all" })
+  for (const i of filters) {
+    html += template(i)
+  }
+  filterDiv.innerHTML = html
+}
+
+function applyNameFilter() {
+  const filterName = NeverNull(document.getElementById("filter-name")) as HTMLInputElement
+  const recipes = NeverNull(document.getElementById("recipes"))
+  for (const i of recipes.children) {
+    const recipe = NeverNull(i.querySelector(".recipe"))
+    if ((recipe.textContent || "").search(new RegExp(filterName.value, "i")) !== -1) {
+      i.setAttribute("style", "")
+    } else {
+      i.setAttribute("style", "display:none")
+    }
+  }
+}
+
+function connectNameFilter() {
+  const filterName = NeverNull(document.getElementById("filter-name")) as HTMLInputElement
+  filterName.oninput = applyNameFilter
+}
+
 (async function () {
   try {
+    connectNameFilter()
     const baseUrl = "https://localhost:3000"
     const auctions = await getJson(baseUrl + "/auctions/1") as AuctionInfo
     const items = await getJson(baseUrl + "/items") as ItemInfos
     const recipes = await getJson(baseUrl + "/recipes") as RecipeInfos
     const profits = calculateProfits(recipes, items, auctions)
     const filters = calculateFilterOptions(recipes)
+    updateFilters(filters)
     updateRecipes(profits)
-    console.log(filters) // TODO
+    applyNameFilter()
   } catch (error) {
     console.error("Failed to get data", error)
   }

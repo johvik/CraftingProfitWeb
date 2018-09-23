@@ -5,7 +5,7 @@
   "license": "MIT",
   "author": "johvik",
   "scripts": {
-    "dev": "webpack-dev-server --open --hot --mode development",
+    "dev": "webpack-dev-server --hot --mode development",
     "build": "webpack --progress --hide-modules --mode production"
   },
   "devDependencies": {
