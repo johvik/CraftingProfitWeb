@@ -52,10 +52,16 @@ customElements.define("x-item",
       this.icon.src = "https://wow.zamimg.com/images/wow/icons/medium/" + icon + ".jpg"
       let title = name
       if (vendor) {
-        title += "\nVendor: " + formatMoney(vendor)
+        title += `\nVendor: ${formatMoney(vendor)}`
+        if (quantity > 1) {
+          title += ` (${formatMoney(vendor * quantity)})`
+        }
       }
       if (auction) {
-        title += "\nAuction: " + formatMoney(auction)
+        title += `\nAuction: ${formatMoney(auction)}`
+        if (quantity > 1) {
+          title += ` (${formatMoney(auction * quantity)})`
+        }
       }
       this.title = title
     }
