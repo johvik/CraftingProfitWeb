@@ -66,6 +66,7 @@ function findCost(recipe: Recipe, items: ItemInfos, auctions: AuctionInfos) {
 type Profit = {
   id: number,
   name: string,
+  trade: string,
   crafts: CostInfo,
   cost: Cost
 }
@@ -75,6 +76,7 @@ function calculateProfit(id: number, recipe: Recipe, items: ItemInfos, auctions:
   return {
     id: id,
     name: recipe.name,
+    trade: recipe.trade,
     crafts: crafts,
     cost: findCost(recipe, items, auctions)
   }
@@ -221,6 +223,7 @@ function updateProfit(profit: Profit, item: Element, money: Element, unknownMain
 }
 
 function updateRecipe(element: Element, profit: Profit) {
+  element.setAttribute("profession", profit.trade)
   const recipe = NeverNull(element.querySelector(".recipe"))
   const craftsItem = NeverNull(NeverNull(element.querySelector(".crafts")).firstElementChild)
   const reagents = NeverNull(element.querySelector(".reagents"))
@@ -267,8 +270,8 @@ function updateFilters(filters: FilterOption[]) {
   const template = (filter: FilterOption) => {
     return `
     <div class="control">
-      <label class="checkbox" disabled>
-        <input type="checkbox" value="${filter.key}" checked disabled>
+      <label class="checkbox">
+        <input type="checkbox" value="${filter.key}" checked>
         ${filter.text}
       </label>
     </div>`
@@ -281,12 +284,23 @@ function updateFilters(filters: FilterOption[]) {
   filterDiv.innerHTML = html
 }
 
-function applyNameFilter() {
+function applyFilters() {
   const filterName = document.getElementById("filter-name") as HTMLInputElement
   const recipes = NeverNull(document.getElementById("recipes"))
+  const nameFilter = new RegExp(filterName.value, "i")
+  const checkboxes = document.querySelectorAll("#filters input")
+  const professionFilters = []
+  for (const i of checkboxes) {
+    const checkbox = i as HTMLInputElement
+    if (checkbox.checked && checkbox.value !== "all") {
+      professionFilters.push(checkbox.value)
+    }
+  }
+
   for (const i of recipes.children) {
     const recipe = NeverNull(i.querySelector(".recipe"))
-    if ((recipe.textContent || "").search(new RegExp(filterName.value, "i")) !== -1) {
+    const profession = i.getAttribute("profession")
+    if ((recipe.textContent || "").search(nameFilter) !== -1 && professionFilters.some(value => value === profession)) {
       i.setAttribute("style", "")
     } else {
       i.setAttribute("style", "display:none")
@@ -296,7 +310,41 @@ function applyNameFilter() {
 
 function connectNameFilter() {
   const filterName = document.getElementById("filter-name") as HTMLInputElement
-  filterName.oninput = applyNameFilter
+  filterName.oninput = applyFilters
+}
+
+function onProfessionFilterChange(event: Event) {
+  const element = event.srcElement as HTMLInputElement
+  const checked = element.checked
+  const profession = element.value
+
+  if (profession === "all") {
+    const checkboxes = document.querySelectorAll("#filters input")
+    for (const i of checkboxes) {
+      const checkbox = i as HTMLInputElement
+      checkbox.checked = checked
+    }
+  } else {
+    const checkboxes = document.querySelectorAll("#filters input")
+    let allUnchecked = true
+    for (const i of checkboxes) {
+      const checkbox = i as HTMLInputElement
+      if (checkbox.value !== "all") {
+        allUnchecked = allUnchecked && !checkbox.checked
+      }
+    }
+    const allCheckbox = document.querySelector("#filters input") as HTMLInputElement
+    allCheckbox.checked = !allUnchecked
+  }
+  applyFilters()
+}
+
+function connectProfessionFilter() {
+  const checkboxes = document.querySelectorAll("#filters input")
+  for (const i of checkboxes) {
+    const checkbox = i as HTMLInputElement
+    checkbox.onchange = onProfessionFilterChange
+  }
 }
 
 declare const BASE_URL: string
@@ -312,7 +360,8 @@ declare const BASE_URL: string
     const filters = calculateFilterOptions(recipes)
     updateFilters(filters)
     updateRecipes(profits)
-    applyNameFilter()
+    applyFilters()
+    connectProfessionFilter()
   } catch (error) {
     console.error("Failed to get data", error)
   }
