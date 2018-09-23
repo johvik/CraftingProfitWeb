@@ -299,10 +299,12 @@ function connectNameFilter() {
   filterName.oninput = applyNameFilter
 }
 
+declare const BASE_URL: string
+
 (async function () {
   try {
     connectNameFilter()
-    const baseUrl = "https://localhost:3000"
+    const baseUrl = BASE_URL
     const auctions = await getJson(baseUrl + "/auctions/1") as AuctionInfo
     const items = await getJson(baseUrl + "/items") as ItemInfos
     const recipes = await getJson(baseUrl + "/recipes") as RecipeInfos
