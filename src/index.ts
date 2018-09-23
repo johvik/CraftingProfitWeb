@@ -282,7 +282,7 @@ function updateFilters(filters: FilterOption[]) {
 }
 
 function applyNameFilter() {
-  const filterName = NeverNull(document.getElementById("filter-name")) as HTMLInputElement
+  const filterName = document.getElementById("filter-name") as HTMLInputElement
   const recipes = NeverNull(document.getElementById("recipes"))
   for (const i of recipes.children) {
     const recipe = NeverNull(i.querySelector(".recipe"))
@@ -295,7 +295,7 @@ function applyNameFilter() {
 }
 
 function connectNameFilter() {
-  const filterName = NeverNull(document.getElementById("filter-name")) as HTMLInputElement
+  const filterName = document.getElementById("filter-name") as HTMLInputElement
   filterName.oninput = applyNameFilter
 }
 
