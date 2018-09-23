@@ -4,15 +4,30 @@ const template = document.createElement("template")
 
 template.innerHTML = `
 <style>
+.wrapper {
+  position: relative;
+  cursor: default;
+}
 .icon {
   height: 36px;
   width: 36px;
   padding: 4px;
   background-image: url("https://wow.zamimg.com/images/Icon/medium/border/default.png");
 }
+.quantity {
+  position: absolute;
+  right: 10px;
+  bottom: 5px;
+  color: white;
+  text-shadow: 0 0 2px black;
+}
 </style>
-<span class="quantity"></span>
-<img class="icon"></img>
+
+<span class="wrapper">
+  <img class="icon">
+  </img>
+  <span class="quantity"></span>
+</span>
 `
 
 customElements.define("x-item",
@@ -48,7 +63,7 @@ customElements.define("x-item",
       const vendor = Number(this.getAttribute("vendor"))
       const auction = Number(this.getAttribute("auction"))
 
-      this.quantity.textContent = quantity + "x"
+      this.quantity.textContent = quantity > 1 ? (quantity + "") : ""
       this.icon.src = "https://wow.zamimg.com/images/wow/icons/medium/" + icon + ".jpg"
       let title = name
       if (vendor) {
