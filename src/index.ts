@@ -60,6 +60,7 @@ function findCost(recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos) 
 type Profit = {
   id: number,
   name: string,
+  icon: string,
   profession: string,
   crafts?: CostInfo,
   cost: Cost
@@ -70,6 +71,7 @@ function calculateProfit(id: number, recipe: RecipeInfo, items: ItemInfos, aucti
   return {
     id: id,
     name: recipe.name,
+    icon: recipe.icon,
     profession: recipe.profession,
     crafts: crafts,
     cost: findCost(recipe, items, auctions)
@@ -204,6 +206,10 @@ function updateRecipe(element: Element, profit: Profit) {
 
   recipe.textContent = profit.name
   updateXItem(profit.crafts, craftsItem)
+  if (!profit.crafts) {
+    craftsItem.setAttribute("name", profit.name)
+    craftsItem.setAttribute("icon", profit.icon)
+  }
   craftsItem.setAttribute("vendor", "")
   updateReagents(profit.cost.reagents, reagents)
   updateProfit(profit, item, money, unknown)
