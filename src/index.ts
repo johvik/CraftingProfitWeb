@@ -256,9 +256,8 @@ function applyFilters() {
   }
 
   for (const i of recipes.children) {
-    const recipe = NeverNull(i.querySelector(".recipe"))
     const profession = i.getAttribute("profession")
-    if ((recipe.textContent || "").search(nameFilter) !== -1 && professionFilters.some(value => value === profession)) {
+    if ((i.innerHTML || "").search(nameFilter) !== -1 && professionFilters.some(value => value === profession)) {
       i.setAttribute("style", "")
     } else {
       i.setAttribute("style", "display:none")
