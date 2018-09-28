@@ -1,6 +1,6 @@
 import "./components/item"
 import "./components/money"
-import { AuctionInfo, AuctionItem, Item, ItemInfos, Recipe, RecipeInfos, RecipeItem } from "./types"
+import { AuctionInfo, AuctionItem, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo } from "./types"
 import { getJson, NeverNull, NeverUndefined } from "./utils"
 
 type AuctionInfos = { [id: number]: AuctionItem | undefined }
@@ -14,24 +14,18 @@ function findAuctionPrice(id: number, auctions: AuctionInfos) {
 }
 
 type CostInfo = {
-  item?: Item,
+  item?: ItemInfo,
   auctionPrice: number,
   quantity: number
 }
 
-function findCostInfo(reagent: RecipeItem, items: ItemInfos, auctions: AuctionInfos): CostInfo {
-  const item = items[reagent.id]
-  const auctionPrice = findAuctionPrice(reagent.id, auctions)
-  if (item) {
-    return {
-      item: item.item,
-      auctionPrice: auctionPrice,
-      quantity: reagent.quantity
-    }
-  }
+function findCostInfo(crafts: RecipeItem, items: ItemInfos, auctions: AuctionInfos): CostInfo {
+  const item = items[crafts.id]
+  const auctionPrice = findAuctionPrice(crafts.id, auctions)
   return {
+    item: item,
     auctionPrice: auctionPrice,
-    quantity: reagent.quantity
+    quantity: crafts.quantity
   }
 }
 
@@ -41,7 +35,7 @@ type Cost = {
   unknown: CostInfo[]
 }
 
-function findCost(recipe: Recipe, items: ItemInfos, auctions: AuctionInfos) {
+function findCost(recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos) {
   return recipe.reagents.reduce(
     (object: Cost, reagent) => {
       const costInfo = findCostInfo(reagent, items, auctions)
@@ -66,17 +60,17 @@ function findCost(recipe: Recipe, items: ItemInfos, auctions: AuctionInfos) {
 type Profit = {
   id: number,
   name: string,
-  trade: string,
-  crafts: CostInfo,
+  profession: string,
+  crafts?: CostInfo,
   cost: Cost
 }
 
-function calculateProfit(id: number, recipe: Recipe, items: ItemInfos, auctions: AuctionInfos): Profit {
-  const crafts = findCostInfo(recipe.crafts, items, auctions)
+function calculateProfit(id: number, recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos): Profit {
+  const crafts = recipe.crafts ? findCostInfo(recipe.crafts, items, auctions) : undefined
   return {
     id: id,
     name: recipe.name,
-    trade: recipe.trade,
+    profession: recipe.profession,
     crafts: crafts,
     cost: findCost(recipe, items, auctions)
   }
@@ -92,10 +86,8 @@ function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray:
   const profits: Profit[] = []
 
   for (const key in recipes) {
-    const recipe = NeverUndefined(recipes[key]).recipe
-    if (recipe) {
-      profits.push(calculateProfit(Number(key), recipe, items, auctions))
-    }
+    const recipe = NeverUndefined(recipes[key])
+    profits.push(calculateProfit(Number(key), recipe, items, auctions))
   }
 
   // Sort by: number of unknowns, profit, id
@@ -104,8 +96,8 @@ function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray:
     if (diff) {
       return diff
     }
-    const profitA = (a.crafts.auctionPrice * a.crafts.quantity) - a.cost.cost
-    const profitB = (b.crafts.auctionPrice * b.crafts.quantity) - b.cost.cost
+    const profitA = (a.crafts ? (a.crafts.auctionPrice * a.crafts.quantity) : 0) - a.cost.cost
+    const profitB = (b.crafts ? (b.crafts.auctionPrice * b.crafts.quantity) : 0) - b.cost.cost
     diff = profitB - profitA
     if (diff) {
       return diff
@@ -113,35 +105,6 @@ function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray:
     return a.id - b.id
   })
   return profits
-}
-
-type FilterOption = {
-  key: string,
-  text: string
-}
-
-function calculateFilterOptions(recipes: RecipeInfos): FilterOption[] {
-  const options: { [id: string]: string | undefined } = {}
-
-  for (const key in recipes) {
-    const recipe = NeverUndefined(recipes[key]).recipe
-    if (recipe) {
-      const key = recipe.trade
-      if (!options[key]) {
-        const match = key.toLowerCase().match(/[a-z]+_(.+)/)
-        if (match) {
-          options[key] = match[1].charAt(0).toUpperCase() + match[1].slice(1)
-        }
-      }
-    }
-  }
-
-  const array: FilterOption[] = []
-  for (const key in options) {
-    const text = NeverUndefined(options[key])
-    array.push({ key: key, text: text })
-  }
-  return array.sort()
 }
 
 const template = document.createElement("template")
@@ -161,12 +124,20 @@ template.innerHTML = `
 </tr>
 `
 
-function updateXItem(costInfo: CostInfo, element: Element) {
-  element.setAttribute("name", costInfo.item ? costInfo.item.name : "")
-  element.setAttribute("quantity", costInfo.quantity + "")
-  element.setAttribute("icon", costInfo.item ? costInfo.item.icon : "")
-  element.setAttribute("vendor", costInfo.item ? (costInfo.item.price + "") : "")
-  element.setAttribute("auction", costInfo.auctionPrice + "")
+function updateXItem(costInfo: CostInfo | undefined, element: Element) {
+  if (costInfo) {
+    element.setAttribute("name", costInfo.item ? costInfo.item.name : "")
+    element.setAttribute("quantity", costInfo.quantity + "")
+    element.setAttribute("icon", costInfo.item ? costInfo.item.icon : "")
+    element.setAttribute("vendor", costInfo.item ? (costInfo.item.price + "") : "")
+    element.setAttribute("auction", costInfo.auctionPrice + "")
+  } else {
+    element.setAttribute("name", "")
+    element.setAttribute("quantity", "")
+    element.setAttribute("icon", "")
+    element.setAttribute("vendor", "")
+    element.setAttribute("auction", "")
+  }
 }
 
 function updateReagents(reagents: CostInfo[], element: Element) {
@@ -186,7 +157,7 @@ function updateReagents(reagents: CostInfo[], element: Element) {
 }
 
 function updateProfit(profit: Profit, item: Element, money: Element, unknownMain: Element) {
-  if (!profit.crafts.auctionPrice) {
+  if (!profit.crafts || !profit.crafts.auctionPrice) {
     updateXItem(profit.crafts, item)
     item.setAttribute("vendor", "")
     item.setAttribute("style", "")
@@ -194,8 +165,8 @@ function updateProfit(profit: Profit, item: Element, money: Element, unknownMain
     item.setAttribute("style", "display:none")
   }
 
-  if (profit.crafts.auctionPrice || profit.cost.cost) {
-    money.setAttribute("copper", ((profit.crafts.auctionPrice * profit.crafts.quantity) - profit.cost.cost) + "")
+  if ((profit.crafts && profit.crafts.auctionPrice) || profit.cost.cost) {
+    money.setAttribute("copper", ((profit.crafts ? (profit.crafts.auctionPrice * profit.crafts.quantity) : 0) - profit.cost.cost) + "")
   } else {
     money.setAttribute("style", "display:none")
   }
@@ -223,7 +194,7 @@ function updateProfit(profit: Profit, item: Element, money: Element, unknownMain
 }
 
 function updateRecipe(element: Element, profit: Profit) {
-  element.setAttribute("profession", profit.trade)
+  element.setAttribute("profession", profit.profession)
   const recipe = NeverNull(element.querySelector(".recipe"))
   const craftsItem = NeverNull(NeverNull(element.querySelector(".crafts")).firstElementChild)
   const reagents = NeverNull(element.querySelector(".reagents"))
@@ -263,25 +234,6 @@ function updateRecipes(profits: Profit[]) {
     updateRecipe(fragment.children[i], profits[i])
   }
   recipesBody.appendChild(fragment)
-}
-
-function updateFilters(filters: FilterOption[]) {
-  const filterDiv = NeverNull(document.getElementById("filters"))
-  const template = (filter: FilterOption) => {
-    return `
-    <div class="control">
-      <label class="checkbox">
-        <input type="checkbox" value="${filter.key}" checked>
-        ${filter.text}
-      </label>
-    </div>`
-  }
-
-  let html = template({ key: "all", text: "Select all" })
-  for (const i of filters) {
-    html += template(i)
-  }
-  filterDiv.innerHTML = html
 }
 
 function applyFilters() {
@@ -354,11 +306,8 @@ declare const BASE_URL: string
     connectNameFilter()
     const baseUrl = BASE_URL
     const auctions = await getJson(baseUrl + "/auctions/1") as AuctionInfo
-    const items = await getJson(baseUrl + "/items") as ItemInfos
-    const recipes = await getJson(baseUrl + "/recipes") as RecipeInfos
-    const profits = calculateProfits(recipes, items, auctions)
-    const filters = calculateFilterOptions(recipes)
-    updateFilters(filters)
+    const data = await getJson(baseUrl + "/data") as DataInfo
+    const profits = calculateProfits(data.recipes, data.items, auctions)
     updateRecipes(profits)
     applyFilters()
     connectProfessionFilter()

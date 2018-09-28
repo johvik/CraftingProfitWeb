@@ -12,20 +12,11 @@ export type AuctionInfo = {
   auctions: AuctionItem[]
 }
 
-export type Item = {
+export type ItemInfo = {
   name: string,
   icon: string,
-  price: number,
-  stackSize: number
-}
-
-type ItemInfo = {
   updated: string,
-  item?: Item
-}
-
-export type ItemInfos = {
-  [id: number]: ItemInfo | undefined
+  price?: number
 }
 
 export type RecipeItem = {
@@ -33,19 +24,24 @@ export type RecipeItem = {
   quantity: number
 }
 
-export type Recipe = {
+export type RecipeInfo = {
+  crafts?: RecipeItem,
   name: string,
-  rank: number,
-  trade: string,
+  icon: string,
+  profession: string,
   reagents: RecipeItem[],
-  crafts: RecipeItem
+  updated: string
 }
 
-type RecipeInfo = {
-  updated: string,
-  recipe?: Recipe
+export type ItemInfos = {
+  [id: number]: ItemInfo | undefined
 }
 
 export type RecipeInfos = {
   [id: number]: RecipeInfo | undefined
+}
+
+export type DataInfo = {
+  items: ItemInfos,
+  recipes: RecipeInfos
 }
