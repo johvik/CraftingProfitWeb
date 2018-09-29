@@ -1,84 +1,69 @@
-import { NeverNull } from "../utils"
 import { formatMoney } from "./money"
-const template = document.createElement("template")
+import { NeverUndefined } from "../utils"
 
-template.innerHTML = `
-<style>
-.wrapper {
-  position: relative;
-  cursor: default;
+export type ItemInfo = {
+  name?: string,
+  icon?: string,
+  quantity: number,
+  auction: number,
+  vendor: number
 }
-.icon {
-  height: 36px;
-  width: 36px;
-  padding: 4px;
-  background-image: url("https://wow.zamimg.com/images/Icon/medium/border/default.png");
-}
-.quantity {
-  position: absolute;
-  right: 10px;
-  bottom: 5px;
-  color: white;
-  text-shadow: 0 0 2px black;
-}
-</style>
 
-<span class="wrapper">
-  <img class="icon">
-  </img>
-  <span class="quantity"></span>
-</span>
-`
+export class Item {
+  readonly element = document.createElement("span")
+  private readonly icon = document.createElement("img")
+  private readonly quantity = document.createElement("span")
 
-customElements.define("x-item",
-  class Item extends HTMLElement {
-    readonly quantity: HTMLSpanElement
-    readonly icon: HTMLImageElement
+  constructor() {
+    this.element.classList.add("item-wrapper")
+    this.element.appendChild(this.icon)
+    this.element.appendChild(this.quantity)
+  }
 
-    constructor() {
-      super()
-
-      const shadowRoot = this.attachShadow({ mode: "closed" })
-      shadowRoot.appendChild(template.content.cloneNode(true))
-      this.quantity = NeverNull(shadowRoot.querySelector(".quantity"))
-      this.icon = NeverNull(shadowRoot.querySelector(".icon"))
-
-      if (this.isConnected) {
-        this.update()
+  private static getTitle(item: ItemInfo) {
+    let title = item.name || "?"
+    if (item.vendor) {
+      title += `\nVendor: ${formatMoney(item.vendor)}`
+      if (item.quantity > 1) {
+        title += ` (${formatMoney(item.vendor * item.quantity)})`
       }
     }
+    if (item.auction) {
+      title += `\nAuction: ${formatMoney(item.auction)}`
+      if (item.quantity > 1) {
+        title += ` (${formatMoney(item.auction * item.quantity)})`
+      }
+    }
+    return title
+  }
 
-    static get observedAttributes() {
-      return ["name", "quantity", "icon", "vendor", "auction"]
+  update(item: ItemInfo) {
+    this.element.title = Item.getTitle(item)
+    const icon = item.icon || "inv_misc_questionmark"
+    this.icon.src = `https://wow.zamimg.com/images/wow/icons/medium/${icon}.jpg`
+    this.quantity.textContent = item.quantity > 1 ? item.quantity.toString() : ""
+  }
+}
+
+export class Items {
+  readonly element = document.createElement("span")
+  private readonly items: Item[] = []
+
+  update(itemInfos: ItemInfo[]) {
+    // Reuse old elemets and add new ones if needed
+    while (this.items.length > itemInfos.length) {
+      const item = NeverUndefined(this.items.pop())
+      this.element.removeChild(item.element)
+    }
+    while (this.items.length < itemInfos.length) {
+      const item = new Item()
+      this.items.push(item)
+      this.element.appendChild(item.element)
     }
 
-    attributeChangedCallback() {
-      this.update()
-    }
-
-    update() {
-      const name = this.getAttribute("name") || "?"
-      const quantity = Number(this.getAttribute("quantity") || 1)
-      const icon = this.getAttribute("icon") || "inv_misc_questionmark"
-      const vendor = Number(this.getAttribute("vendor"))
-      const auction = Number(this.getAttribute("auction"))
-
-      this.quantity.textContent = quantity > 1 ? (quantity + "") : ""
-      this.icon.src = "https://wow.zamimg.com/images/wow/icons/medium/" + icon + ".jpg"
-      let title = name
-      if (vendor) {
-        title += `\nVendor: ${formatMoney(vendor)}`
-        if (quantity > 1) {
-          title += ` (${formatMoney(vendor * quantity)})`
-        }
-      }
-      if (auction) {
-        title += `\nAuction: ${formatMoney(auction)}`
-        if (quantity > 1) {
-          title += ` (${formatMoney(auction * quantity)})`
-        }
-      }
-      this.title = title
+    // Update
+    for (let i = 0; i < this.items.length; i++) {
+      this.items[i].update(itemInfos[i])
     }
   }
-)
+}

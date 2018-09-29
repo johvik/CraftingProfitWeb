@@ -9,28 +9,10 @@ export function formatMoney(copper: number) {
   return gold + "g " + silver + "s " + copper + "c"
 }
 
-customElements.define("x-money",
-  class Money extends HTMLElement {
-    readonly shadow: ShadowRoot
+export class Money {
+  readonly element = document.createElement("span")
 
-    constructor() {
-      super()
-
-      this.shadow = this.attachShadow({ mode: "closed" })
-      this.update()
-    }
-
-    static get observedAttributes() {
-      return ["copper"]
-    }
-
-    attributeChangedCallback() {
-      this.update()
-    }
-
-    update() {
-      const copper = Number(this.getAttribute("copper") || "NaN")
-      this.shadow.textContent = formatMoney(copper)
-    }
+  update(copper: number) {
+    this.element.textContent = formatMoney(copper)
   }
-)
+}
