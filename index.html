@@ -5,70 +5,85 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Crafting Profit</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
+  <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
 </head>
 <body>
   <div class="container">
     <section class="section">
-      <div id="filters" class="field">
-        <div class="control">
-          <label class="checkbox">
-            <input type="checkbox" value="all" checked>
-            Select all
-          </label>
+      <div class="columns">
+        <div class="column">
+          <div id="filters" class="field">
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" value="all" checked>
+                Select all
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" value="alchemy" checked>
+                Alchemy
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" value="blacksmithing" checked>
+                Blacksmithing
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" value="cooking" checked>
+                Cooking
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" value="enchanting" checked>
+                Enchanting
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" value="engineering" checked>
+                Engineering
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" value="inscription" checked>
+                Inscription
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" value="jewelcrafting" checked>
+                Jewelcrafting
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" value="leatherworking" checked>
+                Leatherworking
+              </label>
+            </div>
+            <div class="control">
+              <label class="checkbox">
+                <input type="checkbox" value="tailoring" checked>
+                Tailoring
+              </label>
+            </div>
+          </div>
         </div>
-        <div class="control">
-          <label class="checkbox">
-            <input type="checkbox" value="alchemy" checked>
-            Alchemy
-          </label>
-        </div>
-        <div class="control">
-          <label class="checkbox">
-            <input type="checkbox" value="blacksmithing" checked>
-            Blacksmithing
-          </label>
-        </div>
-        <div class="control">
-          <label class="checkbox">
-            <input type="checkbox" value="cooking" checked>
-            Cooking
-          </label>
-        </div>
-        <div class="control">
-          <label class="checkbox">
-            <input type="checkbox" value="enchanting" checked>
-            Enchanting
-          </label>
-        </div>
-        <div class="control">
-          <label class="checkbox">
-            <input type="checkbox" value="engineering" checked>
-            Engineering
-          </label>
-        </div>
-        <div class="control">
-          <label class="checkbox">
-            <input type="checkbox" value="inscription" checked>
-            Inscription
-          </label>
-        </div>
-        <div class="control">
-          <label class="checkbox">
-            <input type="checkbox" value="jewelcrafting" checked>
-            Jewelcrafting
-          </label>
-        </div>
-        <div class="control">
-          <label class="checkbox">
-            <input type="checkbox" value="leatherworking" checked>
-            Leatherworking
-          </label>
-        </div>
-        <div class="control">
-          <label class="checkbox">
-            <input type="checkbox" value="tailoring" checked>
-            Tailoring
-          </label>
+        <div class="column">
+          <p class="is-pulled-right">
+            Updated: <span id="updated">never</span>
+            <a href="" id="refresh" style="display:none" class="button is-small">
+              <span class="icon">
+                <i class="fas fa-sync"></i>
+              </span>
+            </a>
+          </p>
         </div>
       </div>
       <div class="field">

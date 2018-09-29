@@ -2,6 +2,8 @@ import "./components/item"
 import "./components/money"
 import { AuctionInfo, AuctionItem, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo } from "./types"
 import { getJson, NeverNull, NeverUndefined } from "./utils"
+import { watchForUpdates } from "./components/updated"
+import { BASE_URL, REALM_ID } from "./constants"
 
 type AuctionInfos = { [id: number]: AuctionItem | undefined }
 
@@ -304,14 +306,13 @@ function connectProfessionFilter() {
   }
 }
 
-declare const BASE_URL: string
-
 (async function () {
   try {
     const baseUrl = BASE_URL
-    const auctions = await getJson(baseUrl + "/auctions/1") as AuctionInfo
+    const auctions = await getJson(baseUrl + "/auctions/" + REALM_ID) as AuctionInfo
     const data = await getJson(baseUrl + "/data") as DataInfo
     const profits = calculateProfits(data.recipes, data.items, auctions)
+    watchForUpdates(new Date(auctions.lastModified))
     updateRecipes(profits)
     applyFilters()
     connectNameFilter()

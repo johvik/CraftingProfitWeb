@@ -23,6 +23,7 @@ module.exports = (_, argv) => {
       new CleanWebpackPlugin(["dist"]),
       new CopyWebpackPlugin([{ from: "index.html", to: "" }]),
       new webpack.DefinePlugin({
+        REALM_ID: 1,
         BASE_URL: JSON.stringify(argv.mode === "production" ? "" : "https://localhost:3000")
       })
     ],

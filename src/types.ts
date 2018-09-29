@@ -45,3 +45,11 @@ export type DataInfo = {
   items: ItemInfos,
   recipes: RecipeInfos
 }
+
+export type LastUpdateInfo = {
+  id: number,
+  lastAttempt: string,
+  lastModified: string
+}
+
+export type LastUpdate = LastUpdateInfo[]
