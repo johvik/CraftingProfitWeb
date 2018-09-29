@@ -308,13 +308,13 @@ declare const BASE_URL: string
 
 (async function () {
   try {
-    connectNameFilter()
     const baseUrl = BASE_URL
     const auctions = await getJson(baseUrl + "/auctions/1") as AuctionInfo
     const data = await getJson(baseUrl + "/data") as DataInfo
     const profits = calculateProfits(data.recipes, data.items, auctions)
     updateRecipes(profits)
     applyFilters()
+    connectNameFilter()
     connectProfessionFilter()
   } catch (error) {
     console.error("Failed to get data", error)
