@@ -245,6 +245,7 @@ function updateRecipes(profits: Profit[]) {
 }
 
 function applyFilters() {
+  const emptyInfo = NeverNull(document.getElementById("empty-info"))
   const filterName = document.getElementById("filter-name") as HTMLInputElement
   const recipes = NeverNull(document.getElementById("recipes"))
   const nameFilter = new RegExp(filterName.value, "i")
@@ -257,13 +258,21 @@ function applyFilters() {
     }
   }
 
+  let empty = true
   for (const i of recipes.children) {
     const profession = i.getAttribute("profession")
     if ((i.innerHTML || "").search(nameFilter) !== -1 && professionFilters.some(value => value === profession)) {
+      empty = false
       i.setAttribute("style", "")
     } else {
       i.setAttribute("style", "display:none")
     }
+  }
+
+  if (empty) {
+    emptyInfo.setAttribute("style", "")
+  } else {
+    emptyInfo.setAttribute("style", "display:none")
   }
 }
 
