@@ -71,8 +71,6 @@ export class ProfitDom {
   }
 
   update(profit: Profit) {
-    this.element.setAttribute("profession", profit.profession)
-
     this.recipe.textContent = profit.name
     this.recipe.href = `https://www.wowhead.com/spell=${profit.id}`
 

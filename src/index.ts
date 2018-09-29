@@ -111,14 +111,24 @@ function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray:
   return profits
 }
 
+const domData: {
+  profit: Profit,
+  dom: ProfitDom
+}[] = []
+
 function updateRecipes(profits: Profit[]) {
   const recipesBody = NeverNull(document.getElementById("recipes"))
 
   const fragment = document.createDocumentFragment()
 
   for (const i in profits) {
+    const profit = profits[i]
     const dom = new ProfitDom()
-    dom.update(profits[i])
+    domData.push({
+      profit: profit,
+      dom: dom
+    })
+    dom.update(profit)
     fragment.appendChild(dom.element)
   }
   recipesBody.appendChild(fragment)
@@ -127,7 +137,6 @@ function updateRecipes(profits: Profit[]) {
 function applyFilters() {
   const emptyInfo = NeverNull(document.getElementById("empty-info"))
   const filterName = document.getElementById("filter-name") as HTMLInputElement
-  const recipes = NeverNull(document.getElementById("recipes"))
   const nameFilter = new RegExp(filterName.value, "i")
   const checkboxes = document.querySelectorAll("#filters input")
   const professionFilters = []
@@ -139,13 +148,12 @@ function applyFilters() {
   }
 
   let empty = true
-  for (const i of recipes.children) {
-    const profession = i.getAttribute("profession")
-    if ((i.innerHTML || "").search(nameFilter) !== -1 && professionFilters.some(value => value === profession)) {
+  for (const i of domData) {
+    if ((i.dom.element.innerHTML || "").search(nameFilter) !== -1 && professionFilters.some(value => value === i.profit.profession)) {
       empty = false
-      i.setAttribute("style", "")
+      i.dom.element.style.display = ""
     } else {
-      i.setAttribute("style", "display:none")
+      i.dom.element.style.display = "none"
     }
   }
 
