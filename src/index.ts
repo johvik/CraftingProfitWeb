@@ -206,7 +206,7 @@ function updateRecipe(element: Element, profit: Profit) {
   const money = NeverNull(element.querySelector(".money"))
   const unknown = NeverNull(element.querySelector(".unknown"))
 
-  recipe.textContent = profit.name
+  recipe.innerHTML = `<a href="https://www.wowhead.com/spell=${profit.id}">${profit.name}</a>`
   updateXItem(profit.crafts, craftsItem)
   if (!profit.crafts) {
     craftsItem.setAttribute("name", profit.name)
