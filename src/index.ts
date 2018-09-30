@@ -4,6 +4,7 @@ import { AuctionInfo, AuctionItem, DataInfo, RecipeInfos, ItemInfos, RecipeInfo,
 import { getJson, NeverNull, NeverUndefined } from "./utils"
 import { watchForUpdates } from "./components/updated"
 import { BASE_URL, REALM_ID } from "./constants"
+import { Filters } from "./components/filters"
 
 type AuctionInfos = { [id: number]: AuctionItem | undefined }
 
@@ -111,10 +112,14 @@ function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray:
   return profits
 }
 
-const domData: {
+export type DomData = {
   profit: Profit,
   dom: ProfitDom
-}[] = []
+}
+
+const domData: DomData[] = []
+
+const filters = new Filters(domData)
 
 function updateRecipes(profits: Profit[]) {
   const recipesBody = NeverNull(document.getElementById("recipes"))
@@ -134,78 +139,7 @@ function updateRecipes(profits: Profit[]) {
   recipesBody.appendChild(fragment)
 }
 
-function applyFilters() {
-  const emptyInfo = NeverNull(document.getElementById("empty-info"))
-  const filterName = document.getElementById("filter-name") as HTMLInputElement
-  const nameFilter = new RegExp(filterName.value, "i")
-  const checkboxes = document.querySelectorAll("#filters input")
-  const professionFilters = []
-  for (const i of checkboxes) {
-    const checkbox = i as HTMLInputElement
-    if (checkbox.checked && checkbox.value !== "all") {
-      professionFilters.push(checkbox.value)
-    }
-  }
-
-  let empty = true
-  for (const i of domData) {
-    if ((i.dom.element.innerHTML || "").search(nameFilter) !== -1 && professionFilters.some(value => value === i.profit.profession)) {
-      empty = false
-      i.dom.element.style.display = ""
-    } else {
-      i.dom.element.style.display = "none"
-    }
-  }
-
-  if (empty) {
-    emptyInfo.setAttribute("style", "")
-  } else {
-    emptyInfo.setAttribute("style", "display:none")
-  }
-}
-
-function connectNameFilter() {
-  const filterName = document.getElementById("filter-name") as HTMLInputElement
-  filterName.oninput = applyFilters
-}
-
-function onProfessionFilterChange(event: Event) {
-  const element = event.srcElement as HTMLInputElement
-  const checked = element.checked
-  const profession = element.value
-
-  if (profession === "all") {
-    const checkboxes = document.querySelectorAll("#filters input")
-    for (const i of checkboxes) {
-      const checkbox = i as HTMLInputElement
-      checkbox.checked = checked
-    }
-  } else {
-    const checkboxes = document.querySelectorAll("#filters input")
-    let allUnchecked = true
-    for (const i of checkboxes) {
-      const checkbox = i as HTMLInputElement
-      if (checkbox.value !== "all") {
-        allUnchecked = allUnchecked && !checkbox.checked
-      }
-    }
-    const allCheckbox = document.querySelector("#filters input") as HTMLInputElement
-    allCheckbox.checked = !allUnchecked
-  }
-  applyFilters()
-}
-
-function connectProfessionFilter() {
-  const checkboxes = document.querySelectorAll("#filters input")
-  for (const i of checkboxes) {
-    const checkbox = i as HTMLInputElement
-    checkbox.onchange = onProfessionFilterChange
-  }
-}
-
 (async function () {
-  connectNameFilter()
-  connectProfessionFilter()
   try {
     const baseUrl = BASE_URL
     const auctions = await getJson(baseUrl + "/auctions/" + REALM_ID) as AuctionInfo
@@ -213,7 +147,7 @@ function connectProfessionFilter() {
     const profits = calculateProfits(data.recipes, data.items, auctions)
     watchForUpdates(new Date(auctions.lastModified))
     updateRecipes(profits)
-    applyFilters()
+    filters.apply()
   } catch (error) {
     console.error("Failed to get data", error)
   }
