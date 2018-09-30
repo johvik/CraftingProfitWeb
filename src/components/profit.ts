@@ -1,4 +1,4 @@
-import { Money } from "./money"
+import { Money, formatMoney } from "./money"
 import { Profit, CostInfo } from "../index"
 import { Item, Items, ItemInfo } from "./item"
 
@@ -89,6 +89,15 @@ export class ProfitDom {
       this.money.element.style.display = ""
     } else {
       this.money.element.style.display = "none"
+    }
+    if (profit.cost.cost) {
+      let title = `Cost: ${formatMoney(profit.cost.cost)}`
+      if (profit.cost.unknown.length > 0) {
+        title += " + unknown"
+      }
+      this.money.element.title = title
+    } else {
+      this.money.element.title = ""
     }
     this.unknownCost.update(ProfitDom.itemInfos(profit.cost.unknown))
     if (profit.cost.unknown.length === 0) {
