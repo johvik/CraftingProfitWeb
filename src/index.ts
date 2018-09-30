@@ -2,7 +2,7 @@ import "./components/item"
 import { ProfitDom } from "./components/profit"
 import { AuctionInfo, AuctionItem, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo } from "./types"
 import { getJson, NeverNull, NeverUndefined } from "./utils"
-import { watchForUpdates } from "./components/updated"
+import { Update } from "./components/update"
 import { BASE_URL, REALM_ID } from "./constants"
 import { Filters } from "./components/filters"
 
@@ -118,23 +118,34 @@ export type DomData = {
 }
 
 const domData: DomData[] = []
-
 const filters = new Filters(domData)
+const update = new Update()
 
 function updateRecipes(profits: Profit[]) {
   const recipesBody = NeverNull(document.getElementById("recipes"))
 
+  while (recipesBody.lastChild) {
+    recipesBody.removeChild(recipesBody.lastChild)
+  }
+  while (domData.length > profits.length) {
+    domData.pop()
+  }
+  for (let i = 0; i < profits.length; i++) {
+    if (domData.length <= i) {
+      domData.push({
+        profit: profits[i],
+        dom: new ProfitDom()
+      })
+    } else {
+      domData[i].profit = profits[i]
+    }
+  }
+
   const fragment = document.createDocumentFragment()
 
-  for (const i in profits) {
-    const profit = profits[i]
-    const dom = new ProfitDom()
-    domData.push({
-      profit: profit,
-      dom: dom
-    })
-    dom.update(profit)
-    fragment.appendChild(dom.element)
+  for (const i of domData) {
+    i.dom.update(i.profit)
+    fragment.appendChild(i.dom.element)
   }
   recipesBody.appendChild(fragment)
 }
@@ -145,7 +156,7 @@ function updateRecipes(profits: Profit[]) {
     const auctions = await getJson(baseUrl + "/auctions/" + REALM_ID) as AuctionInfo
     const data = await getJson(baseUrl + "/data") as DataInfo
     const profits = calculateProfits(data.recipes, data.items, auctions)
-    watchForUpdates(new Date(auctions.lastModified))
+    update.updateComplete(new Date(auctions.lastModified))
     updateRecipes(profits)
     filters.apply()
   } catch (error) {
