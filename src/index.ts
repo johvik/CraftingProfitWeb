@@ -135,6 +135,7 @@ export class CraftingProfit {
         self.filters.apply()
       } catch (error) {
         console.error("Failed to get data", error)
+        self.update.error()
       }
       self.update.done()
     })()

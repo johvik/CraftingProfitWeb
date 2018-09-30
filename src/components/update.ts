@@ -8,11 +8,13 @@ import { CraftingProfit } from "../index"
 export class Update {
   private readonly updated = NeverNull(document.getElementById("updated"))
   private readonly refresh = document.getElementById("refresh") as HTMLAnchorElement
+  private readonly dataFailed = NeverNull(document.getElementById("data-failed"))
   private lastModified: Date = new Date(0)
 
   constructor(craftingProfit: CraftingProfit) {
     this.refresh.onclick = () => {
       this.refresh.classList.add("is-loading")
+      this.dataFailed.style.display = "none"
       craftingProfit.updateData()
     }
 
@@ -58,6 +60,10 @@ export class Update {
   success(modified: Date) {
     this.lastModified = modified
     this.updateContent(false)
+  }
+
+  error() {
+    this.dataFailed.style.display = ""
   }
 
   done() {
