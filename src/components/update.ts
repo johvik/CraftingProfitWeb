@@ -50,8 +50,10 @@ export class Update {
             self.updateContent(self.lastModified.getTime() < modified.getTime())
           }
         }
+        self.dataFailed.style.display = "none"
       } catch (error) {
         console.error("Failed to check for updates", error)
+        self.dataFailed.style.display = ""
         self.updateContent(false)
       }
     })()
@@ -60,6 +62,7 @@ export class Update {
   success(modified: Date) {
     this.lastModified = modified
     this.updateContent(false)
+    this.dataFailed.style.display = "none"
   }
 
   error() {
