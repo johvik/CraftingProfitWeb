@@ -3,7 +3,7 @@ import { LastUpdate } from "../types"
 import { BASE_URL, REALM_ID } from "../constants"
 
 const updated = NeverNull(document.getElementById("updated"))
-const refresh = NeverNull(document.getElementById("refresh"))
+const refresh = document.getElementById("refresh") as HTMLElement
 
 // TODO Refresh without reload, maybe automatic refresh?
 
@@ -14,9 +14,9 @@ function updateDiv(updateAvailable: boolean) {
   const minutes = Math.ceil(diff / (60 * 1000))
   updated.textContent = `${minutes} minutes ago`
   if (updateAvailable) {
-    refresh.setAttribute("style", "")
+    refresh.style.display = ""
   } else {
-    refresh.setAttribute("style", "display:none")
+    refresh.style.display = "none"
   }
 }
 
