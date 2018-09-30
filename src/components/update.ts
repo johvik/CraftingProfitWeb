@@ -1,15 +1,21 @@
 import { NeverNull, getJson } from "../utils"
 import { LastUpdate } from "../types"
 import { BASE_URL, REALM_ID } from "../constants"
+import { CraftingProfit } from "../index"
 
-// TODO Refresh without reload, maybe automatic refresh?
+// TODO Maybe automatic refresh?
 
 export class Update {
   private readonly updated = NeverNull(document.getElementById("updated"))
-  private readonly refresh = document.getElementById("refresh") as HTMLElement
+  private readonly refresh = document.getElementById("refresh") as HTMLAnchorElement
   private lastModified: Date = new Date(0)
 
-  constructor() {
+  constructor(craftingProfit: CraftingProfit) {
+    this.refresh.onclick = () => {
+      this.refresh.classList.add("is-loading")
+      craftingProfit.updateData()
+    }
+
     setInterval(() => {
       this.checkForUpdate()
     }, 60 * 1000)
@@ -49,8 +55,13 @@ export class Update {
     })()
   }
 
-  updateComplete(modified: Date) {
+  success(modified: Date) {
     this.lastModified = modified
     this.updateContent(false)
+  }
+
+  done() {
+    this.refresh.classList.remove("is-loading")
+    this.refresh.style.display = "none"
   }
 }

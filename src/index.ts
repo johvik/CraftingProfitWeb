@@ -117,49 +117,58 @@ export type DomData = {
   dom: ProfitDom
 }
 
-const domData: DomData[] = []
-const filters = new Filters(domData)
-const update = new Update()
+export class CraftingProfit {
+  private readonly domData: DomData[] = []
+  private readonly filters = new Filters(this.domData)
+  private readonly update = new Update(this)
 
-function updateRecipes(profits: Profit[]) {
-  const recipesBody = NeverNull(document.getElementById("recipes"))
+  updateData() {
+    const self = this;
+    (async function () {
+      try {
+        const baseUrl = BASE_URL
+        const auctions = await getJson(baseUrl + "/auctions/" + REALM_ID) as AuctionInfo
+        const data = await getJson(baseUrl + "/data") as DataInfo
+        const profits = calculateProfits(data.recipes, data.items, auctions)
+        self.update.success(new Date(auctions.lastModified))
+        self.updateRecipes(profits)
+        self.filters.apply()
+      } catch (error) {
+        console.error("Failed to get data", error)
+      }
+      self.update.done()
+    })()
+  }
 
-  while (recipesBody.lastChild) {
-    recipesBody.removeChild(recipesBody.lastChild)
-  }
-  while (domData.length > profits.length) {
-    domData.pop()
-  }
-  for (let i = 0; i < profits.length; i++) {
-    if (domData.length <= i) {
-      domData.push({
-        profit: profits[i],
-        dom: new ProfitDom()
-      })
-    } else {
-      domData[i].profit = profits[i]
+  private updateRecipes(profits: Profit[]) {
+    const recipesBody = NeverNull(document.getElementById("recipes"))
+
+    while (recipesBody.lastChild) {
+      recipesBody.removeChild(recipesBody.lastChild)
     }
-  }
+    while (this.domData.length > profits.length) {
+      this.domData.pop()
+    }
+    for (let i = 0; i < profits.length; i++) {
+      if (this.domData.length <= i) {
+        this.domData.push({
+          profit: profits[i],
+          dom: new ProfitDom()
+        })
+      } else {
+        this.domData[i].profit = profits[i]
+      }
+    }
 
-  const fragment = document.createDocumentFragment()
+    const fragment = document.createDocumentFragment()
 
-  for (const i of domData) {
-    i.dom.update(i.profit)
-    fragment.appendChild(i.dom.element)
+    for (const i of this.domData) {
+      i.dom.update(i.profit)
+      fragment.appendChild(i.dom.element)
+    }
+    recipesBody.appendChild(fragment)
   }
-  recipesBody.appendChild(fragment)
 }
 
-(async function () {
-  try {
-    const baseUrl = BASE_URL
-    const auctions = await getJson(baseUrl + "/auctions/" + REALM_ID) as AuctionInfo
-    const data = await getJson(baseUrl + "/data") as DataInfo
-    const profits = calculateProfits(data.recipes, data.items, auctions)
-    update.updateComplete(new Date(auctions.lastModified))
-    updateRecipes(profits)
-    filters.apply()
-  } catch (error) {
-    console.error("Failed to get data", error)
-  }
-})()
+const craftingProfit = new CraftingProfit()
+craftingProfit.updateData()
