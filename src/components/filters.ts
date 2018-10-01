@@ -92,20 +92,22 @@ export class Filters {
     const nameFilter = new RegExp(this.filterName.value, "i")
     const professionFilters = this.professionFilters()
 
-    let empty = true
+    let lastElement: HTMLElement | undefined = undefined
     for (const i of this.domData) {
       if ((i.dom.element.innerHTML || "").search(nameFilter) !== -1 && professionFilters.some(value => value === i.profit.profession)) {
-        empty = false
+        lastElement = i.dom.element
         i.dom.element.style.display = ""
+        i.dom.element.classList.remove("last-row")
       } else {
         i.dom.element.style.display = "none"
       }
     }
 
-    if (empty) {
-      this.emptyInfo.style.display = ""
-    } else {
+    if (lastElement) {
       this.emptyInfo.style.display = "none"
+      lastElement.classList.add("last-row")
+    } else {
+      this.emptyInfo.style.display = ""
     }
   }
 }
