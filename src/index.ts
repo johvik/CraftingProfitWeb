@@ -1,6 +1,6 @@
 import "./components/item"
 import { ProfitDom } from "./components/profit"
-import { AuctionInfo, AuctionItem, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo } from "./types"
+import { AuctionInfo, AuctionItem, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo, PriceType } from "./types"
 import { getJson, NeverNull, NeverUndefined } from "./utils"
 import { Update } from "./components/update"
 import { BASE_URL, REALM_ID } from "./constants"
@@ -8,10 +8,10 @@ import { Filters } from "./components/filters"
 
 type AuctionInfos = { [id: number]: AuctionItem | undefined }
 
-function findAuctionPrice(id: number, auctions: AuctionInfos) {
+function findAuctionPrice(id: number, auctions: AuctionInfos, priceType: PriceType) {
   const auction = auctions[id]
   if (auction) {
-    return auction.lowestPrice
+    return auction[priceType]
   }
   return 0
 }
@@ -22,9 +22,9 @@ export type CostInfo = {
   quantity: number
 }
 
-function findCostInfo(crafts: RecipeItem, items: ItemInfos, auctions: AuctionInfos): CostInfo {
+function findCostInfo(crafts: RecipeItem, items: ItemInfos, auctions: AuctionInfos, priceType: PriceType): CostInfo {
   const item = items[crafts.id]
-  const auctionPrice = findAuctionPrice(crafts.id, auctions)
+  const auctionPrice = findAuctionPrice(crafts.id, auctions, priceType)
   return {
     item: item,
     auctionPrice: auctionPrice,
@@ -38,10 +38,10 @@ type Cost = {
   unknown: CostInfo[]
 }
 
-function findCost(recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos) {
+function findCost(recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos, priceType: PriceType) {
   return recipe.reagents.reduce(
     (object: Cost, reagent) => {
-      const costInfo = findCostInfo(reagent, items, auctions)
+      const costInfo = findCostInfo(reagent, items, auctions, priceType)
       const cost =
         ((costInfo.item ? costInfo.item.price : 0) || costInfo.auctionPrice) * reagent.quantity
       object.reagents.push(costInfo)
@@ -69,19 +69,19 @@ export type Profit = {
   cost: Cost,
 }
 
-function calculateProfit(id: number, recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos): Profit {
-  const crafts = recipe.crafts ? findCostInfo(recipe.crafts, items, auctions) : undefined
+function calculateProfit(id: number, recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos, craftsPriceType: PriceType, costPriceType: PriceType): Profit {
+  const crafts = recipe.crafts ? findCostInfo(recipe.crafts, items, auctions, craftsPriceType) : undefined
   return {
     id: id,
     name: recipe.name,
     icon: recipe.icon,
     profession: recipe.profession,
     crafts: crafts,
-    cost: findCost(recipe, items, auctions)
+    cost: findCost(recipe, items, auctions, costPriceType)
   }
 }
 
-function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray: AuctionInfo) {
+function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray: AuctionInfo, craftsPriceType: PriceType, costPriceType: PriceType) {
   // Convert from an array to help with lookups
   const auctions: AuctionInfos = auctionsArray.auctions.reduce((object: AuctionInfos, auction) => {
     object[auction.id] = auction
@@ -92,7 +92,7 @@ function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray:
 
   for (const key in recipes) {
     const recipe = NeverUndefined(recipes[key])
-    profits.push(calculateProfit(Number(key), recipe, items, auctions))
+    profits.push(calculateProfit(Number(key), recipe, items, auctions, craftsPriceType, costPriceType))
   }
 
   // Sort by: number of unknowns, profit, id
@@ -129,7 +129,9 @@ export class CraftingProfit {
         const baseUrl = BASE_URL
         const auctions = await getJson(baseUrl + "/auctions/" + REALM_ID) as AuctionInfo
         const data = await getJson(baseUrl + "/data") as DataInfo
-        const profits = calculateProfits(data.recipes, data.items, auctions)
+        const craftsPriceType: PriceType = "lowestPrice"
+        const costPriceType: PriceType = "lowestPrice"
+        const profits = calculateProfits(data.recipes, data.items, auctions, craftsPriceType, costPriceType)
         self.update.success(new Date(auctions.lastModified))
         self.updateRecipes(profits)
         self.filters.apply()

@@ -1,3 +1,5 @@
+export type PriceType = "lowestPrice" | "firstQuartile" | "secondQuartile"
+
 export type AuctionItem = {
   id: number,
   lowestPrice: number,
