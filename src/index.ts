@@ -125,7 +125,7 @@ export class CraftingProfit {
   private readonly domData: DomData[] = []
   private readonly settings = new Settings(this)
   private readonly filters = new Filters(this.domData)
-  private readonly update = new Update(this)
+  private readonly update = new Update(this, this.settings)
 
   updateData() {
     const self = this;

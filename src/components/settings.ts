@@ -11,6 +11,7 @@ export class Settings {
   private readonly costPriceType = document.getElementById("cost-price-type") as HTMLSelectElement
   private readonly craftsTypeKey = "crafts-type"
   private readonly costTypeKey = "cost-type"
+  private readonly automaticRefreshKey = "automatic-refresh"
 
   constructor(craftingProfit: CraftingProfit) {
     const openSettings = NeverNull(document.getElementById("open-settings"))
@@ -52,6 +53,12 @@ export class Settings {
     this.costPriceType.onchange = () => {
       this.onPriceTypeChange(craftingProfit)
     }
+
+    const automaticRefresh = document.getElementById("automatic-refresh") as HTMLInputElement
+    automaticRefresh.checked = this.getAutomaticRefresh()
+    automaticRefresh.onchange = () => {
+      localStorage.setItem(this.automaticRefreshKey, JSON.stringify(automaticRefresh.checked))
+    }
   }
 
   private static getPriceType(value: string): PriceType {
@@ -75,6 +82,10 @@ export class Settings {
 
   getCostPriceType() {
     return Settings.getPriceType(localStorage.getItem(this.costTypeKey) || "")
+  }
+
+  getAutomaticRefresh() {
+    return JSON.parse(localStorage.getItem(this.automaticRefreshKey) || "true") === true
   }
 
   private applyTheme(themeUrl: string) {

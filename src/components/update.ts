@@ -2,16 +2,17 @@ import { NeverNull, getJson } from "../utils"
 import { LastUpdate } from "../types"
 import { BASE_URL, REALM_ID } from "../constants"
 import { CraftingProfit } from "../index"
-
-// TODO Maybe automatic refresh?
+import { Settings } from "./settings"
 
 export class Update {
   private readonly updated = NeverNull(document.getElementById("updated"))
   private readonly refresh = document.getElementById("refresh") as HTMLAnchorElement
   private readonly dataFailed = NeverNull(document.getElementById("data-failed"))
   private lastModified: Date = new Date(0)
+  private readonly settings: Settings
 
-  constructor(craftingProfit: CraftingProfit) {
+  constructor(craftingProfit: CraftingProfit, settings: Settings) {
+    this.settings = settings
     this.refresh.onclick = () => {
       this.refresh.classList.add("is-loading")
       this.dataFailed.style.visibility = "hidden"
@@ -33,6 +34,9 @@ export class Update {
     }
     if (updateAvailable) {
       this.refresh.style.visibility = ""
+      if (this.settings.getAutomaticRefresh()) {
+        this.refresh.click()
+      }
     } else {
       this.refresh.style.visibility = "hidden"
     }
