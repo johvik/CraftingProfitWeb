@@ -1,5 +1,5 @@
 import { Money, formatMoney } from "./money"
-import { Profit, CostInfo } from "../index"
+import { Profit, CostInfo, auctionProfit } from "../index"
 import { Item, Items, ItemInfo } from "./item"
 
 export class ProfitDom {
@@ -84,7 +84,7 @@ export class ProfitDom {
     } else {
       this.profitItem.element.style.display = "none"
     }
-    this.money.update((profit.crafts ? (profit.crafts.auctionPrice * profit.crafts.quantity) : 0) - profit.cost.cost)
+    this.money.update(auctionProfit(profit))
     if ((profit.crafts && profit.crafts.auctionPrice) || profit.cost.cost) {
       this.money.element.style.display = ""
     } else {

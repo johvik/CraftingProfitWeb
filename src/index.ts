@@ -69,6 +69,10 @@ export type Profit = {
   cost: Cost,
 }
 
+export function auctionProfit(profit: Profit) {
+  return (profit.crafts ? Math.floor(profit.crafts.auctionPrice * profit.crafts.quantity * 0.95) : 0) - profit.cost.cost
+}
+
 function calculateProfit(id: number, recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos, craftsPriceType: PriceType, costPriceType: PriceType): Profit {
   const crafts = recipe.crafts ? findCostInfo(recipe.crafts, items, auctions, craftsPriceType) : undefined
   return {
@@ -101,8 +105,8 @@ function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray:
     if (diff) {
       return diff
     }
-    const profitA = (a.crafts ? (a.crafts.auctionPrice * a.crafts.quantity) : 0) - a.cost.cost
-    const profitB = (b.crafts ? (b.crafts.auctionPrice * b.crafts.quantity) : 0) - b.cost.cost
+    const profitA = auctionProfit(a)
+    const profitB = auctionProfit(b)
     diff = profitB - profitA
     if (diff) {
       return diff
