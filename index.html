@@ -157,6 +157,42 @@
             </div>
           </div>
         </div>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label"><abbr title="Auction price to use for crafted items and when calculating the profit of crafted items">Crafts</abbr></label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <div class="select">
+                  <select id="crafts-price-type">
+                    <option value="lowestPrice">Lowest</option>
+                    <option value="firstQuartile">First quartile</option>
+                    <option value="secondQuartile">Second quartile</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label"><abbr title="Auction price to use when calculating the cost of all reagents">Reagents</abbr></label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <div class="select">
+                  <select id="cost-price-type">
+                    <option value="lowestPrice">Lowest</option>
+                    <option value="firstQuartile">First quartile</option>
+                    <option value="secondQuartile">Second quartile</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <button class="modal-close is-large" aria-label="close"></button>

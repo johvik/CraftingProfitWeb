@@ -123,6 +123,7 @@ export type DomData = {
 
 export class CraftingProfit {
   private readonly domData: DomData[] = []
+  private readonly settings = new Settings(this)
   private readonly filters = new Filters(this.domData)
   private readonly update = new Update(this)
 
@@ -133,8 +134,8 @@ export class CraftingProfit {
         const baseUrl = BASE_URL
         const auctions = await getJson(baseUrl + "/auctions/" + REALM_ID) as AuctionInfo
         const data = await getJson(baseUrl + "/data") as DataInfo
-        const craftsPriceType: PriceType = "lowestPrice"
-        const costPriceType: PriceType = "lowestPrice"
+        const craftsPriceType: PriceType = self.settings.getCraftsPriceType()
+        const costPriceType: PriceType = self.settings.getCostPriceType()
         const profits = calculateProfits(data.recipes, data.items, auctions, craftsPriceType, costPriceType)
         self.update.success(new Date(auctions.lastModified))
         self.updateRecipes(profits)
@@ -176,8 +177,6 @@ export class CraftingProfit {
     recipesBody.appendChild(fragment)
   }
 }
-
-new Settings() // tslint:disable-line:no-unused-expression
 
 const craftingProfit = new CraftingProfit()
 craftingProfit.updateData()
