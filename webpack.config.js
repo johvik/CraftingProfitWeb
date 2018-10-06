@@ -2,6 +2,7 @@ const webpack = require("webpack");
 const path = require("path");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+require("dotenv").config();
 
 module.exports = (_, argv) => {
   return {
@@ -24,7 +25,7 @@ module.exports = (_, argv) => {
       new CopyWebpackPlugin([{ from: "index.html", to: "" }]),
       new webpack.DefinePlugin({
         REALM_ID: 1,
-        BASE_URL: JSON.stringify(argv.mode === "production" ? "" : "https://localhost:3000")
+        BASE_URL: JSON.stringify(argv.mode === "production" ? "" : (process.env.BASE_URL || "https://localhost:3000"))
       })
     ],
     output: {
