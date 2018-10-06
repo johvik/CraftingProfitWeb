@@ -44,8 +44,8 @@ export class Settings {
       this.applyTheme(theme.value)
     }
 
-    this.craftsPriceType.value = localStorage.getItem(this.craftsTypeKey) || "lowestPrice"
-    this.costPriceType.value = localStorage.getItem(this.costTypeKey) || "firstQuartile"
+    this.craftsPriceType.value = this.getCraftsPriceType()
+    this.costPriceType.value = this.getCostPriceType()
 
     this.craftsPriceType.onchange = () => {
       this.onPriceTypeChange(craftingProfit)
@@ -77,11 +77,11 @@ export class Settings {
   }
 
   getCraftsPriceType() {
-    return Settings.getPriceType(localStorage.getItem(this.craftsTypeKey) || "")
+    return Settings.getPriceType(localStorage.getItem(this.craftsTypeKey) || "lowestPrice")
   }
 
   getCostPriceType() {
-    return Settings.getPriceType(localStorage.getItem(this.costTypeKey) || "")
+    return Settings.getPriceType(localStorage.getItem(this.costTypeKey) || "firstQuartile")
   }
 
   getAutomaticRefresh() {
