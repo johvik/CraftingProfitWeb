@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Crafting Profit</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
+  <link id="main-style" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
   <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
   <style>
     .item-wrapper {
@@ -134,8 +134,33 @@
           </tbody>
         </table>
       </div>
-      <script src="bundle.js"></script>
     </div>
   </section>
+  <footer class="footer">
+    <div class="container">
+      <a id="open-settings">Settings</a>
+    </div>
+  </footer>
+  <div id="settings" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+      <div class="box">
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Theme</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <input id="theme" class="input" type="text" placeholder="CSS URL">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+  </div>
+  <script src="bundle.js"></script>
 </body>
 </html>

@@ -1,10 +1,10 @@
-import "./components/item"
 import { ProfitDom } from "./components/profit"
 import { AuctionInfo, AuctionItem, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo, PriceType } from "./types"
 import { getJson, NeverNull, NeverUndefined } from "./utils"
 import { Update } from "./components/update"
 import { BASE_URL, REALM_ID } from "./constants"
 import { Filters } from "./components/filters"
+import { Settings } from "./components/settings"
 
 type AuctionInfos = { [id: number]: AuctionItem | undefined }
 
@@ -176,6 +176,8 @@ export class CraftingProfit {
     recipesBody.appendChild(fragment)
   }
 }
+
+new Settings() // tslint:disable-line:no-unused-expression
 
 const craftingProfit = new CraftingProfit()
 craftingProfit.updateData()
