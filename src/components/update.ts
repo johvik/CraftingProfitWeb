@@ -14,7 +14,7 @@ export class Update {
   constructor(craftingProfit: CraftingProfit) {
     this.refresh.onclick = () => {
       this.refresh.classList.add("is-loading")
-      this.dataFailed.style.display = "none"
+      this.dataFailed.style.visibility = "hidden"
       craftingProfit.updateData()
     }
 
@@ -32,9 +32,9 @@ export class Update {
       this.updated.textContent = `${minutes} minutes ago`
     }
     if (updateAvailable) {
-      this.refresh.style.display = ""
+      this.refresh.style.visibility = ""
     } else {
-      this.refresh.style.display = "none"
+      this.refresh.style.visibility = "hidden"
     }
   }
 
@@ -50,10 +50,10 @@ export class Update {
             self.updateContent(self.lastModified.getTime() < modified.getTime())
           }
         }
-        self.dataFailed.style.display = "none"
+        self.dataFailed.style.visibility = "hidden"
       } catch (error) {
         console.error("Failed to check for updates", error)
-        self.dataFailed.style.display = ""
+        self.dataFailed.style.visibility = ""
         self.updateContent(false)
       }
     })()
@@ -62,15 +62,15 @@ export class Update {
   success(modified: Date) {
     this.lastModified = modified
     this.updateContent(false)
-    this.dataFailed.style.display = "none"
+    this.dataFailed.style.visibility = "hidden"
   }
 
   error() {
-    this.dataFailed.style.display = ""
+    this.dataFailed.style.visibility = ""
   }
 
   done() {
     this.refresh.classList.remove("is-loading")
-    this.refresh.style.display = "none"
+    this.refresh.style.visibility = "hidden"
   }
 }
