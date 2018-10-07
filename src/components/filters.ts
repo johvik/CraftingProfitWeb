@@ -1,13 +1,15 @@
 import { DomData } from "../index"
+import { NeverNull } from "../utils"
 
 export class Filters {
   private readonly domData: DomData[]
   private readonly filterName = document.getElementById("filter-name") as HTMLInputElement
-  private readonly allCheckbox = document.querySelector("#filters input") as HTMLInputElement
-  private readonly checkboxes = document.querySelectorAll("#filters input")
+  private readonly allCheckbox = document.querySelector("#filters a") as HTMLElement
+  private readonly checkboxes = document.querySelectorAll("#filters a")
   private readonly emptyInfo = document.getElementById("empty-info") as HTMLElement
   private static readonly nameKey = "name"
   private static readonly professionsKey = "professions"
+  private static readonly selectAllFilter = "select all"
 
   constructor(domData: DomData[]) {
     this.domData = domData
@@ -27,51 +29,68 @@ export class Filters {
     }
 
     for (const i of this.checkboxes) {
-      const checkbox = i as HTMLInputElement
-      checkbox.onchange = (event: Event) => {
-        this.onProfessionFilterChange(event)
+      const checkbox = i as HTMLElement
+      checkbox.onclick = (event: Event) => {
+        const element = event.srcElement as HTMLElement
+        Filters.setChecked(!Filters.isChecked(element), element)
+        this.onProfessionFilterChange(element)
       }
     }
   }
 
+  private static setChecked(checked: boolean, element: HTMLElement) {
+    if (checked) {
+      element.classList.remove("unchecked")
+    } else {
+      element.classList.add("unchecked")
+    }
+  }
+
+  private static isChecked(element: HTMLElement) {
+    return !element.classList.contains("unchecked")
+  }
+
+  private static getProfessionFilter(element: HTMLElement) {
+    return NeverNull(element.textContent).toLowerCase()
+  }
+
   private updateCheckboxes(professionFilters: string[]) {
     for (const i of this.checkboxes) {
-      const checkbox = i as HTMLInputElement
-      checkbox.checked = false
+      const checkbox = i as HTMLElement
+      Filters.setChecked(false, checkbox)
     }
 
     let allUnchecked = true
     for (const filter of professionFilters) {
       for (const i of this.checkboxes) {
-        const checkbox = i as HTMLInputElement
-        if (checkbox.value === filter) {
-          checkbox.checked = true
+        const checkbox = i as HTMLElement
+        if (Filters.getProfessionFilter(checkbox) === filter) {
+          Filters.setChecked(true, checkbox)
           allUnchecked = false
         }
       }
     }
-    this.allCheckbox.checked = !allUnchecked
+    Filters.setChecked(!allUnchecked, this.allCheckbox)
   }
 
-  private onProfessionFilterChange(event: Event) {
-    const element = event.srcElement as HTMLInputElement
-    const checked = element.checked
-    const profession = element.value
+  private onProfessionFilterChange(element: HTMLElement) {
+    const checked = Filters.isChecked(element)
+    const profession = Filters.getProfessionFilter(element)
 
-    if (profession === "all") {
+    if (profession === Filters.selectAllFilter) {
       for (const i of this.checkboxes) {
-        const checkbox = i as HTMLInputElement
-        checkbox.checked = checked
+        const checkbox = i as HTMLElement
+        Filters.setChecked(checked, checkbox)
       }
     } else {
       let allUnchecked = true
       for (const i of this.checkboxes) {
-        const checkbox = i as HTMLInputElement
-        if (checkbox.value !== "all") {
-          allUnchecked = allUnchecked && !checkbox.checked
+        const checkbox = i as HTMLElement
+        if (Filters.getProfessionFilter(checkbox) !== Filters.selectAllFilter) {
+          allUnchecked = allUnchecked && !Filters.isChecked(checkbox)
         }
       }
-      this.allCheckbox.checked = !allUnchecked
+      Filters.setChecked(!allUnchecked, this.allCheckbox)
     }
     localStorage.setItem(Filters.professionsKey, JSON.stringify(this.professionFilters()))
     this.apply()
@@ -80,9 +99,10 @@ export class Filters {
   private professionFilters() {
     const filters = []
     for (const i of this.checkboxes) {
-      const checkbox = i as HTMLInputElement
-      if (checkbox.checked && checkbox.value !== "all") {
-        filters.push(checkbox.value)
+      const checkbox = i as HTMLElement
+      const filter = Filters.getProfessionFilter(checkbox)
+      if (Filters.isChecked(checkbox) && filter !== Filters.selectAllFilter) {
+        filters.push(filter)
       }
     }
     return filters

@@ -25,6 +25,12 @@
     #recipes tr.last-row td {
       border-bottom-width: 0;
     }
+    .filter.unchecked {
+      text-decoration: line-through;
+    }
+    a.filter.unchecked:hover {
+      text-decoration: line-through underline;
+    }
   </style>
 </head>
 <body>
@@ -49,66 +55,16 @@
         </div>
       </div>
       <div id="filters" class="tags">
-        <div class="tag">
-          <label class="checkbox">
-            <input type="checkbox" value="all" checked>
-            Select all
-          </label>
-        </div>
-        <div class="tag">
-          <label class="checkbox">
-            <input type="checkbox" value="alchemy" checked>
-            Alchemy
-          </label>
-        </div>
-        <div class="tag">
-          <label class="checkbox">
-            <input type="checkbox" value="blacksmithing" checked>
-            Blacksmithing
-          </label>
-        </div>
-        <div class="tag">
-          <label class="checkbox">
-            <input type="checkbox" value="cooking" checked>
-            Cooking
-          </label>
-        </div>
-        <div class="tag">
-          <label class="checkbox">
-            <input type="checkbox" value="enchanting" checked>
-            Enchanting
-          </label>
-        </div>
-        <div class="tag">
-          <label class="checkbox">
-            <input type="checkbox" value="engineering" checked>
-            Engineering
-          </label>
-        </div>
-        <div class="tag">
-          <label class="checkbox">
-            <input type="checkbox" value="inscription" checked>
-            Inscription
-          </label>
-        </div>
-        <div class="tag">
-          <label class="checkbox">
-            <input type="checkbox" value="jewelcrafting" checked>
-            Jewelcrafting
-          </label>
-        </div>
-        <div class="tag">
-          <label class="checkbox">
-            <input type="checkbox" value="leatherworking" checked>
-            Leatherworking
-          </label>
-        </div>
-        <div class="tag">
-          <label class="checkbox">
-            <input type="checkbox" value="tailoring" checked>
-            Tailoring
-          </label>
-        </div>
+        <a class="tag filter">Select all</a>
+        <a class="tag filter">Alchemy</a>
+        <a class="tag filter">Blacksmithing</a>
+        <a class="tag filter">Cooking</a>
+        <a class="tag filter">Enchanting</a>
+        <a class="tag filter">Engineering</a>
+        <a class="tag filter">Inscription</a>
+        <a class="tag filter">Jewelcrafting</a>
+        <a class="tag filter">Leatherworking</a>
+        <a class="tag filter">Tailoring</a>
       </div>
       <div class="field">
         <div class="control">
