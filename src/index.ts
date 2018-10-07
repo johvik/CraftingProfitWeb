@@ -7,28 +7,25 @@ import { Filters } from "./components/filters"
 import { Settings } from "./components/settings"
 import { AuctionPrice } from "./components/item"
 
+type AuctionPriceInfo = AuctionPrice & { quantity: number }
+
 type AuctionItemInfo = {
-  quantity: number,
-  prices: AuctionPrice[] // Newest first
+  prices: AuctionPriceInfo[] // Oldest first
 }
 
 type AuctionInfos = { [id: number]: AuctionItemInfo | undefined }
 
-function findAuctionPrice(id: number, auctions: AuctionInfos): AuctionPrice | undefined {
+function findAuctionPrice(id: number, auctions: AuctionInfos): AuctionPriceInfo | undefined {
   const auction = auctions[id]
   if (auction) {
-    return {
-      lowestPrice: auction.prices[0].lowestPrice,
-      firstQuartile: auction.prices[0].firstQuartile,
-      secondQuartile: auction.prices[0].secondQuartile
-    }
+    return auction.prices[auction.prices.length - 1]
   }
   return undefined
 }
 
 export type CostInfo = {
   item?: ItemInfo,
-  auctionPrice?: AuctionPrice,
+  auctionPrice?: AuctionPriceInfo,
   quantity: number
 }
 
@@ -43,7 +40,7 @@ function findCostInfo(crafts: RecipeItem, items: ItemInfos, auctions: AuctionInf
 }
 
 type Cost = {
-  auctionPrice: AuctionPrice
+  auctionPrice: AuctionPriceInfo
   reagents: CostInfo[],
   unknown: CostInfo[]
 }
@@ -70,6 +67,7 @@ function findCost(recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos) 
     },
     {
       auctionPrice: {
+        quantity: 0,
         lowestPrice: 0,
         firstQuartile: 0,
         secondQuartile: 0
@@ -110,16 +108,16 @@ function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray:
   const auctions: AuctionInfos = auctionsArray.auctions.reduce((object: AuctionInfos, auction) => {
     const itemInfo = object[auction.id]
     const price = {
+      quantity: auction.quantity,
       lowestPrice: auction.lowestPrice,
       firstQuartile: auction.firstQuartile,
       secondQuartile: auction.secondQuartile
     }
     if (itemInfo) {
-      // Prices are sorted by date on the server, newest is first
+      // Auctions are sorted by date on the server
       itemInfo.prices.push(price)
     } else {
       object[auction.id] = {
-        quantity: auction.quantity,
         prices: [price]
       }
     }
