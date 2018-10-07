@@ -1,6 +1,6 @@
 export type PriceType = "lowestPrice" | "firstQuartile" | "secondQuartile"
 
-export type AuctionItem = {
+type AuctionItem = {
   id: number,
   lowestPrice: number,
   firstQuartile: number,

@@ -1,5 +1,5 @@
 import { ProfitDom } from "./components/profit"
-import { AuctionInfo, AuctionItem, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo, PriceType } from "./types"
+import { AuctionInfo, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo, PriceType } from "./types"
 import { getJson, NeverNull, NeverUndefined } from "./utils"
 import { Update } from "./components/update"
 import { BASE_URL, REALM_ID } from "./constants"
@@ -7,15 +7,20 @@ import { Filters } from "./components/filters"
 import { Settings } from "./components/settings"
 import { AuctionPrice } from "./components/item"
 
-type AuctionInfos = { [id: number]: AuctionItem | undefined }
+type AuctionItemInfo = {
+  quantity: number,
+  prices: AuctionPrice[] // Newest first
+}
+
+type AuctionInfos = { [id: number]: AuctionItemInfo | undefined }
 
 function findAuctionPrice(id: number, auctions: AuctionInfos): AuctionPrice | undefined {
   const auction = auctions[id]
   if (auction) {
     return {
-      lowestPrice: auction.lowestPrice,
-      firstQuartile: auction.firstQuartile,
-      secondQuartile: auction.secondQuartile
+      lowestPrice: auction.prices[0].lowestPrice,
+      firstQuartile: auction.prices[0].firstQuartile,
+      secondQuartile: auction.prices[0].secondQuartile
     }
   }
   return undefined
@@ -103,8 +108,21 @@ function calculateProfit(id: number, recipe: RecipeInfo, items: ItemInfos, aucti
 function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray: AuctionInfo, craftsPriceType: PriceType, costPriceType: PriceType) {
   // Convert from an array to help with lookups
   const auctions: AuctionInfos = auctionsArray.auctions.reduce((object: AuctionInfos, auction) => {
-    object[auction.id] = auction
-    delete auction.id
+    const itemInfo = object[auction.id]
+    const price = {
+      lowestPrice: auction.lowestPrice,
+      firstQuartile: auction.firstQuartile,
+      secondQuartile: auction.secondQuartile
+    }
+    if (itemInfo) {
+      // Prices are sorted by date on the server, newest is first
+      itemInfo.prices.push(price)
+    } else {
+      object[auction.id] = {
+        quantity: auction.quantity,
+        prices: [price]
+      }
+    }
     return object
   }, {})
   const profits: Profit[] = []
