@@ -81,7 +81,7 @@ export class Settings {
   }
 
   getCostPriceType() {
-    return Settings.getPriceType(localStorage.getItem(this.costTypeKey) || "firstQuartile")
+    return Settings.getPriceType(localStorage.getItem(this.costTypeKey) || "lowestPrice")
   }
 
   getAutomaticRefresh() {
