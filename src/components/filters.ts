@@ -32,7 +32,6 @@ export class Filters {
       const checkbox = i as HTMLElement
       checkbox.onclick = (event: Event) => {
         const element = event.srcElement as HTMLElement
-        element.blur()
         Filters.setChecked(!Filters.isChecked(element), element)
         this.onProfessionFilterChange(element)
       }
