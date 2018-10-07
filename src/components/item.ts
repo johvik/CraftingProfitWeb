@@ -1,11 +1,18 @@
 import { formatMoney } from "./money"
 import { NeverUndefined } from "../utils"
+import { PriceType } from "../types"
+
+export type AuctionPrice = {
+  lowestPrice: number,
+  firstQuartile: number,
+  secondQuartile: number
+}
 
 export type ItemInfo = {
   name?: string,
   icon?: string,
   quantity: number,
-  auction: number,
+  auctionPrice?: AuctionPrice,
   vendor: number
 }
 
@@ -20,6 +27,14 @@ export class Item {
     this.element.appendChild(this.quantity)
   }
 
+  private static getAuctionPrice(auctionPrice: AuctionPrice, quantity: number, priceType: PriceType) {
+    let price = `${formatMoney(auctionPrice[priceType])}`
+    if (quantity > 1) {
+      price += ` (${formatMoney(auctionPrice[priceType] * quantity)})`
+    }
+    return price
+  }
+
   private static getTitle(item: ItemInfo) {
     let title = item.name || "?"
     if (item.vendor) {
@@ -28,11 +43,10 @@ export class Item {
         title += ` (${formatMoney(item.vendor * item.quantity)})`
       }
     }
-    if (item.auction) {
-      title += `\nAuction: ${formatMoney(item.auction)}`
-      if (item.quantity > 1) {
-        title += ` (${formatMoney(item.auction * item.quantity)})`
-      }
+    if (item.auctionPrice) {
+      title += `\nLowest: ${Item.getAuctionPrice(item.auctionPrice, item.quantity, "lowestPrice")}`
+      title += `\n       Q1: ${Item.getAuctionPrice(item.auctionPrice, item.quantity, "firstQuartile")}`
+      title += `\n       Q2: ${Item.getAuctionPrice(item.auctionPrice, item.quantity, "secondQuartile")}`
     }
     return title
   }

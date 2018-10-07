@@ -1,6 +1,7 @@
 import { Money, formatMoney } from "./money"
 import { Profit, CostInfo, auctionProfit } from "../index"
-import { Item, Items, ItemInfo } from "./item"
+import { Item, Items, ItemInfo, AuctionPrice } from "./item"
+import { PriceType } from "../types"
 
 export class ProfitDom {
   readonly element = document.createElement("tr")
@@ -42,7 +43,7 @@ export class ProfitDom {
         name: item ? item.name : undefined,
         icon: item ? item.icon : undefined,
         quantity: profit.crafts.quantity,
-        auction: profit.crafts.auctionPrice,
+        auctionPrice: profit.crafts.auctionPrice,
         vendor: item ? (item.price || 0) : 0
       }
     }
@@ -50,7 +51,7 @@ export class ProfitDom {
       name: useNameAndIcon ? profit.name : undefined,
       icon: useNameAndIcon ? profit.icon : undefined,
       quantity: 1,
-      auction: 0,
+      auctionPrice: undefined,
       vendor: 0
     }
   }
@@ -61,7 +62,7 @@ export class ProfitDom {
       name: item ? item.name : undefined,
       icon: item ? item.icon : undefined,
       quantity: costInfo.quantity,
-      auction: costInfo.auctionPrice,
+      auctionPrice: costInfo.auctionPrice,
       vendor: item ? (item.price || 0) : 0
     }
   }
@@ -70,7 +71,23 @@ export class ProfitDom {
     return costInfos.map(ProfitDom.itemInfo)
   }
 
-  update(profit: Profit) {
+  private static getProfitPrice(profit: Profit, unknown: boolean, craftsPriceType: PriceType, costPriceType: PriceType) {
+    let price = `${formatMoney(auctionProfit(profit, craftsPriceType, costPriceType))}`
+    if (unknown) {
+      price += " - unknown"
+    }
+    return price
+  }
+
+  private static getCostPrice(auctionPrice: AuctionPrice, unknown: boolean, priceType: PriceType) {
+    let price = `${formatMoney(auctionPrice[priceType])}`
+    if (unknown) {
+      price += " + unknown"
+    }
+    return price
+  }
+
+  update(profit: Profit, craftsPriceType: PriceType, costPriceType: PriceType) {
     this.recipe.textContent = profit.name
     this.recipe.href = `https://www.wowhead.com/spell=${profit.id}`
 
@@ -84,26 +101,36 @@ export class ProfitDom {
     } else {
       this.profitItem.element.style.display = "none"
     }
-    this.money.update(auctionProfit(profit))
-    if ((profit.crafts && profit.crafts.auctionPrice) || profit.cost.cost) {
+    this.money.update(auctionProfit(profit, craftsPriceType, costPriceType))
+    let title = ""
+    if ((profit.crafts && profit.crafts.auctionPrice) || profit.cost.auctionPrice[costPriceType]) {
       this.money.element.style.display = ""
     } else {
       this.money.element.style.display = "none"
     }
-    if (profit.cost.cost) {
-      let title = `Cost: ${formatMoney(profit.cost.cost)}`
-      if (profit.cost.unknown.length > 0) {
-        title += " + unknown"
-      }
-      this.money.element.title = title
-    } else {
-      this.money.element.title = ""
+    const unknown = profit.cost.unknown.length > 0
+    if (profit.crafts && profit.crafts.auctionPrice) {
+      title += `Profit\nLowest: ${ProfitDom.getProfitPrice(profit, unknown, "lowestPrice", "lowestPrice")}`
+      title += `\n     LQ1: ${ProfitDom.getProfitPrice(profit, unknown, "lowestPrice", "firstQuartile")}`
+      title += `\n     LQ2: ${ProfitDom.getProfitPrice(profit, unknown, "lowestPrice", "secondQuartile")}`
+      title += `\n       Q1: ${ProfitDom.getProfitPrice(profit, unknown, "firstQuartile", "firstQuartile")}`
+      title += `\n  Q1Q2: ${ProfitDom.getProfitPrice(profit, unknown, "firstQuartile", "secondQuartile")}`
+      title += `\n       Q2: ${ProfitDom.getProfitPrice(profit, unknown, "secondQuartile", "secondQuartile")}`
     }
+    if (profit.cost.auctionPrice.firstQuartile) {
+      if (title) {
+        title += "\n\n"
+      }
+      title += `Cost\nLowest: ${ProfitDom.getCostPrice(profit.cost.auctionPrice, unknown, "lowestPrice")}`
+      title += `\n       Q1: ${ProfitDom.getCostPrice(profit.cost.auctionPrice, unknown, "firstQuartile")}`
+      title += `\n       Q2: ${ProfitDom.getCostPrice(profit.cost.auctionPrice, unknown, "secondQuartile")}`
+    }
+    this.money.element.title = title
     this.unknownCost.update(ProfitDom.itemInfos(profit.cost.unknown))
-    if (profit.cost.unknown.length === 0) {
-      this.unknown.style.display = "none"
-    } else {
+    if (unknown) {
       this.unknown.style.display = ""
+    } else {
+      this.unknown.style.display = "none"
     }
   }
 }
