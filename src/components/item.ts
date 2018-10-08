@@ -1,8 +1,11 @@
 import { formatMoney } from "./money"
 import { NeverUndefined } from "../utils"
 import { PriceType } from "../types"
+import { History } from "./history"
 
 export type AuctionPrice = {
+  quantity: number,
+  date: Date,
   lowestPrice: number,
   firstQuartile: number,
   secondQuartile: number
@@ -12,7 +15,7 @@ export type ItemInfo = {
   name?: string,
   icon?: string,
   quantity: number,
-  auctionPrice?: AuctionPrice,
+  auctionPrices: AuctionPrice[],
   vendor: number
 }
 
@@ -43,10 +46,11 @@ export class Item {
         title += ` (${formatMoney(item.vendor * item.quantity)})`
       }
     }
-    if (item.auctionPrice) {
-      title += `\nLowest: ${Item.getAuctionPrice(item.auctionPrice, item.quantity, "lowestPrice")}`
-      title += `\n       Q1: ${Item.getAuctionPrice(item.auctionPrice, item.quantity, "firstQuartile")}`
-      title += `\n       Q2: ${Item.getAuctionPrice(item.auctionPrice, item.quantity, "secondQuartile")}`
+    const prices = item.auctionPrices.length
+    if (prices > 0) {
+      title += `\nLowest: ${Item.getAuctionPrice(item.auctionPrices[prices - 1], item.quantity, "lowestPrice")}`
+      title += `\n       Q1: ${Item.getAuctionPrice(item.auctionPrices[prices - 1], item.quantity, "firstQuartile")}`
+      title += `\n       Q2: ${Item.getAuctionPrice(item.auctionPrices[prices - 1], item.quantity, "secondQuartile")}`
     }
     return title
   }
@@ -56,6 +60,18 @@ export class Item {
     const icon = item.icon || "inv_misc_questionmark"
     this.icon.src = `https://wow.zamimg.com/images/wow/icons/medium/${icon}.jpg`
     this.quantity.textContent = item.quantity > 1 ? item.quantity.toString() : ""
+    if (item.auctionPrices.length > 0) {
+      this.element.classList.add("has-pointer")
+    } else {
+      this.element.classList.remove("has-pointer")
+    }
+    this.element.onclick = () => {
+      if (item.auctionPrices.length > 0) {
+        History.show(item, this.element)
+      } else {
+        History.hide()
+      }
+    }
   }
 }
 

@@ -9,6 +9,8 @@
     "build": "webpack --progress --hide-modules --mode production"
   },
   "devDependencies": {
+    "@types/chart.js": "^2.7.37",
+    "chart.js": "^2.7.2",
     "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "^4.5.2",
     "dotenv": "^6.0.0",

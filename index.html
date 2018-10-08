@@ -10,6 +10,10 @@
     .item-wrapper {
       position: relative;
       cursor: default;
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
     .item-wrapper img {
       padding: 4px;
@@ -25,12 +29,24 @@
     #recipes tr.last-row td {
       border-bottom-width: 0;
     }
+    #recipes tr.parent td {
+      border-bottom-width: 0;
+    }
+    .filter {
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
     .filter.unchecked {
       text-decoration: line-through;
       opacity: 0.5;
     }
     a.filter.unchecked:hover {
       text-decoration: line-through underline;
+    }
+    .has-pointer {
+      cursor: pointer;
     }
   </style>
 </head>
@@ -88,6 +104,12 @@
             </tr>
           </tbody>
           <tbody id="recipes">
+            <tr id="history-container" style="display:none">
+              <td colspan="4">
+                <h2 id="history-title" class="has-text-centered"></h2>
+                <canvas id="history-canvas" height="120" width="400"></canvas>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -166,6 +188,8 @@
     </div>
     <button class="modal-close is-large" aria-label="close"></button>
   </div>
+  <p id="history-axis-style" style="display:none"></p>
+  <p id="history-tooltip-style" class="has-background-dark has-text-light" style="display:none"></p>
   <script src="bundle.js"></script>
 </body>
 </html>

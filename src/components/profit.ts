@@ -43,7 +43,7 @@ export class ProfitDom {
         name: item ? item.name : undefined,
         icon: item ? item.icon : undefined,
         quantity: profit.crafts.quantity,
-        auctionPrice: profit.crafts.auctionPrice,
+        auctionPrices: profit.crafts.auctionPrices,
         vendor: item ? (item.price || 0) : 0
       }
     }
@@ -51,7 +51,7 @@ export class ProfitDom {
       name: useNameAndIcon ? profit.name : undefined,
       icon: useNameAndIcon ? profit.icon : undefined,
       quantity: 1,
-      auctionPrice: undefined,
+      auctionPrices: [],
       vendor: 0
     }
   }
@@ -62,7 +62,7 @@ export class ProfitDom {
       name: item ? item.name : undefined,
       icon: item ? item.icon : undefined,
       quantity: costInfo.quantity,
-      auctionPrice: costInfo.auctionPrice,
+      auctionPrices: costInfo.auctionPrices,
       vendor: item ? (item.price || 0) : 0
     }
   }
@@ -96,20 +96,20 @@ export class ProfitDom {
     this.reagents.update(ProfitDom.itemInfos(profit.cost.reagents))
 
     this.profitItem.update(ProfitDom.craftsItemInfo(profit, false))
-    if (!profit.crafts || !profit.crafts.auctionPrice) {
+    if (!profit.crafts || profit.crafts.auctionPrices.length === 0) {
       this.profitItem.element.style.display = ""
     } else {
       this.profitItem.element.style.display = "none"
     }
     this.money.update(auctionProfit(profit, craftsPriceType, costPriceType))
     let title = ""
-    if ((profit.crafts && profit.crafts.auctionPrice) || profit.cost.auctionPrice[costPriceType]) {
+    if ((profit.crafts && profit.crafts.auctionPrices.length > 0) || profit.cost.auctionPrice[costPriceType]) {
       this.money.element.style.display = ""
     } else {
       this.money.element.style.display = "none"
     }
     const unknown = profit.cost.unknown.length > 0
-    if (profit.crafts && profit.crafts.auctionPrice) {
+    if (profit.crafts && profit.crafts.auctionPrices.length > 0) {
       title += `Profit\nLowest: ${ProfitDom.getProfitPrice(profit, unknown, "lowestPrice", "lowestPrice")}`
       title += `\n     LQ1: ${ProfitDom.getProfitPrice(profit, unknown, "lowestPrice", "firstQuartile")}`
       title += `\n     LQ2: ${ProfitDom.getProfitPrice(profit, unknown, "lowestPrice", "secondQuartile")}`

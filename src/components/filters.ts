@@ -1,5 +1,6 @@
 import { DomData } from "../index"
 import { NeverNull } from "../utils"
+import { History } from "./history"
 
 export class Filters {
   private readonly domData: DomData[]
@@ -111,6 +112,8 @@ export class Filters {
   apply() {
     const nameFilter = new RegExp(this.filterName.value, "i")
     const professionFilters = this.professionFilters()
+
+    History.hide()
 
     let lastElement: HTMLElement | undefined = undefined
     for (const i of this.domData) {

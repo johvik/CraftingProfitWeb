@@ -1,6 +1,7 @@
 import { NeverNull } from "../utils"
 import { PriceType } from "../types"
 import { CraftingProfit } from "../index"
+import { History } from "./history"
 
 export class Settings {
   private readonly settings = NeverNull(document.getElementById("settings"))
@@ -92,6 +93,7 @@ export class Settings {
     const href = themeUrl || this.defaultTheme
     this.link.href = href
     localStorage.setItem(this.themeKey, href)
+    History.hide()
   }
 
   private close() {
