@@ -18,6 +18,8 @@ export class Update {
       this.dataFailed.style.visibility = "hidden"
       craftingProfit.updateData()
     }
+    this.refresh.style.visibility = ""
+    this.refresh.classList.add("is-loading")
 
     setInterval(() => {
       this.checkForUpdate()
