@@ -145,6 +145,14 @@ export class History {
           titleFontStyle: History.tooltipStyle.fontStyle || undefined,
           mode: "x",
           callbacks: {
+            labelColor: (tooltipItem: ChartTooltipItem, chart: Chart) => {
+              const dataset = NeverUndefined(chart.data.datasets)[NeverUndefined(tooltipItem.datasetIndex)]
+              const color = dataset.borderColor as string
+              return {
+                borderColor: color,
+                backgroundColor: color
+              }
+            },
             label: (tooltipItem: ChartTooltipItem, data: ChartData) => {
               const dataset = NeverUndefined(data.datasets)[NeverUndefined(tooltipItem.datasetIndex)]
               let label = dataset.label || ""
