@@ -21,19 +21,19 @@ export class History {
     const lowestPriceData = item.auctionPrices.map(value => {
       return {
         x: value.date,
-        y: value.lowestPrice / 1000
+        y: value.lowestPrice
       }
     })
     const firstQuartileData = item.auctionPrices.map(value => {
       return {
         x: value.date,
-        y: value.firstQuartile / 1000
+        y: value.firstQuartile
       }
     })
     const secondQuartileData = item.auctionPrices.map(value => {
       return {
         x: value.date,
-        y: value.secondQuartile / 1000
+        y: value.secondQuartile
       }
     })
     const quantityData = item.auctionPrices.map(value => {
@@ -117,7 +117,7 @@ export class History {
             id: "y-axis-gold",
             ticks: {
               callback: (value) => {
-                return `${value}g`
+                return `${value / 10000}g`
               },
               fontColor: History.axisStyle.color || undefined,
               fontFamily: History.axisStyle.fontFamily || undefined,
