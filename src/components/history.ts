@@ -52,47 +52,43 @@ export class History {
       type: "line",
       data: {
         datasets: [{
+          label: "Quantity",
+          data: quantityData,
+          lineTension: 0,
+          pointHitRadius: pointHitRadius,
+          yAxisID: "y-axis-quantity",
+          borderColor: "rgb(196,88,80)",
+          backgroundColor: "rgba(196,88,80,0.3)",
+          fill: false
+        }, {
           label: "Lowest",
           data: lowestPriceData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-gold",
-          borderColor: "#3e95cd",
-          backgroundColor: "#3e95cd"
+          borderColor: "rgb(62,149,205)",
+          backgroundColor: "rgba(62,149,205,0.3)"
         }, {
           label: "First quartile",
           data: firstQuartileData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-gold",
-          borderColor: "#8e5ea2",
-          backgroundColor: "#8e5ea2"
+          borderColor: "rgb(142,94,162)",
+          backgroundColor: "rgba(142,94,162,0.3)"
         }, {
           label: "Second quartile",
           data: secondQuartileData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-gold",
-          borderColor: "#3cba9f",
-          backgroundColor: "#3cba9f"
-        }, {
-          label: "Quantity",
-          data: quantityData,
-          lineTension: 0,
-          pointHitRadius: pointHitRadius,
-          yAxisID: "y-axis-quantity",
-          borderColor: "#c45850",
-          backgroundColor: "#c45850"
+          borderColor: "rgb(60,186,159)",
+          backgroundColor: "rgba(60,186,159,0.3)"
         }]
       },
       options: {
         animation: {
           duration: 0
-        },
-        elements: {
-          line: {
-            fill: false
-          }
         },
         legend: {
           display: false
