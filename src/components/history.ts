@@ -21,19 +21,19 @@ export class History {
     const lowestPriceData = item.auctionPrices.map(value => {
       return {
         x: value.date,
-        y: value.lowestPrice
+        y: value.lowestPrice / 1000
       }
     })
     const firstQuartileData = item.auctionPrices.map(value => {
       return {
         x: value.date,
-        y: value.firstQuartile
+        y: value.firstQuartile / 1000
       }
     })
     const secondQuartileData = item.auctionPrices.map(value => {
       return {
         x: value.date,
-        y: value.secondQuartile
+        y: value.secondQuartile / 1000
       }
     })
     const quantityData = item.auctionPrices.map(value => {
@@ -47,6 +47,7 @@ export class History {
       History.chart.destroy()
     }
 
+    const pointHitRadius = 5
     History.chart = new Chart(History.canvas, {
       type: "line",
       data: {
@@ -54,6 +55,7 @@ export class History {
           label: "Lowest",
           data: lowestPriceData,
           lineTension: 0,
+          pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-gold",
           borderColor: "#3e95cd",
           backgroundColor: "#3e95cd"
@@ -61,6 +63,7 @@ export class History {
           label: "First quartile",
           data: firstQuartileData,
           lineTension: 0,
+          pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-gold",
           borderColor: "#8e5ea2",
           backgroundColor: "#8e5ea2"
@@ -68,6 +71,7 @@ export class History {
           label: "Second quartile",
           data: secondQuartileData,
           lineTension: 0,
+          pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-gold",
           borderColor: "#3cba9f",
           backgroundColor: "#3cba9f"
@@ -75,6 +79,7 @@ export class History {
           label: "Quantity",
           data: quantityData,
           lineTension: 0,
+          pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-quantity",
           borderColor: "#c45850",
           backgroundColor: "#c45850"
@@ -112,7 +117,7 @@ export class History {
             id: "y-axis-gold",
             ticks: {
               callback: (value) => {
-                return formatMoney(Number(value))
+                return `${value}g`
               },
               fontColor: History.axisStyle.color || undefined,
               fontFamily: History.axisStyle.fontFamily || undefined,
@@ -121,9 +126,13 @@ export class History {
           }, {
             id: "y-axis-quantity",
             position: "right",
-            display: false,
             gridLines: {
               drawOnChartArea: false
+            },
+            ticks: {
+              fontColor: History.axisStyle.color || undefined,
+              fontFamily: History.axisStyle.fontFamily || undefined,
+              fontStyle: History.axisStyle.fontStyle || undefined
             }
           }]
         },
