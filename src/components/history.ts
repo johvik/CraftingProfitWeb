@@ -18,10 +18,10 @@ export class History {
     }
     History.lastCaller = caller
 
-    const lowestPriceData = item.auctionPrices.map(value => {
+    const lowestData = item.auctionPrices.map(value => {
       return {
         x: value.date,
-        y: value.lowestPrice
+        y: value.lowest
       }
     })
     const firstQuartileData = item.auctionPrices.map(value => {
@@ -62,7 +62,7 @@ export class History {
           fill: false
         }, {
           label: "Lowest",
-          data: lowestPriceData,
+          data: lowestData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-gold",

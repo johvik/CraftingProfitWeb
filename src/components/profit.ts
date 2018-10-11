@@ -110,9 +110,9 @@ export class ProfitDom {
     }
     const unknown = profit.cost.unknown.length > 0
     if (profit.crafts && profit.crafts.auctionPrices.length > 0) {
-      title += `Profit\nLowest: ${ProfitDom.getProfitPrice(profit, unknown, "lowestPrice", "lowestPrice")}`
-      title += `\n     LQ1: ${ProfitDom.getProfitPrice(profit, unknown, "lowestPrice", "firstQuartile")}`
-      title += `\n     LQ2: ${ProfitDom.getProfitPrice(profit, unknown, "lowestPrice", "secondQuartile")}`
+      title += `Profit\nLowest: ${ProfitDom.getProfitPrice(profit, unknown, "lowest", "lowest")}`
+      title += `\n     LQ1: ${ProfitDom.getProfitPrice(profit, unknown, "lowest", "firstQuartile")}`
+      title += `\n     LQ2: ${ProfitDom.getProfitPrice(profit, unknown, "lowest", "secondQuartile")}`
       title += `\n       Q1: ${ProfitDom.getProfitPrice(profit, unknown, "firstQuartile", "firstQuartile")}`
       title += `\n  Q1Q2: ${ProfitDom.getProfitPrice(profit, unknown, "firstQuartile", "secondQuartile")}`
       title += `\n       Q2: ${ProfitDom.getProfitPrice(profit, unknown, "secondQuartile", "secondQuartile")}`
@@ -121,7 +121,7 @@ export class ProfitDom {
       if (title) {
         title += "\n\n"
       }
-      title += `Cost\nLowest: ${ProfitDom.getCostPrice(profit.cost.auctionPrice, unknown, "lowestPrice")}`
+      title += `Cost\nLowest: ${ProfitDom.getCostPrice(profit.cost.auctionPrice, unknown, "lowest")}`
       title += `\n       Q1: ${ProfitDom.getCostPrice(profit.cost.auctionPrice, unknown, "firstQuartile")}`
       title += `\n       Q2: ${ProfitDom.getCostPrice(profit.cost.auctionPrice, unknown, "secondQuartile")}`
     }

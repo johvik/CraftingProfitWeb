@@ -6,7 +6,7 @@ import { History } from "./history"
 export type AuctionPrice = {
   quantity: number,
   date: Date,
-  lowestPrice: number,
+  lowest: number,
   firstQuartile: number,
   secondQuartile: number
 }
@@ -48,7 +48,7 @@ export class Item {
     }
     const prices = item.auctionPrices.length
     if (prices > 0) {
-      title += `\nLowest: ${Item.getAuctionPrice(item.auctionPrices[prices - 1], item.quantity, "lowestPrice")}`
+      title += `\nLowest: ${Item.getAuctionPrice(item.auctionPrices[prices - 1], item.quantity, "lowest")}`
       title += `\n       Q1: ${Item.getAuctionPrice(item.auctionPrices[prices - 1], item.quantity, "firstQuartile")}`
       title += `\n       Q2: ${Item.getAuctionPrice(item.auctionPrices[prices - 1], item.quantity, "secondQuartile")}`
     }

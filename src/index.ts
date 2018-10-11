@@ -50,14 +50,14 @@ function findCost(recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos) 
       const costInfo = findCostInfo(reagent, items, auctions)
       const prices = costInfo.auctionPrices.length
       const lowestCost =
-        ((costInfo.item ? costInfo.item.price : 0) || (prices > 0 ? costInfo.auctionPrices[prices - 1].lowestPrice : 0)) * reagent.quantity
+        ((costInfo.item ? costInfo.item.price : 0) || (prices > 0 ? costInfo.auctionPrices[prices - 1].lowest : 0)) * reagent.quantity
       const q1Cost =
         ((costInfo.item ? costInfo.item.price : 0) || (prices > 0 ? costInfo.auctionPrices[prices - 1].firstQuartile : 0)) * reagent.quantity
       const q2Cost =
         ((costInfo.item ? costInfo.item.price : 0) || (prices > 0 ? costInfo.auctionPrices[prices - 1].secondQuartile : 0)) * reagent.quantity
       object.reagents.push(costInfo)
       if (lowestCost) {
-        object.auctionPrice.lowestPrice += lowestCost
+        object.auctionPrice.lowest += lowestCost
         object.auctionPrice.firstQuartile += q1Cost
         object.auctionPrice.secondQuartile += q2Cost
       } else {
@@ -68,7 +68,7 @@ function findCost(recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos) 
     {
       auctionPrice: {
         quantity: 0,
-        lowestPrice: 0,
+        lowest: 0,
         firstQuartile: 0,
         secondQuartile: 0,
         date: new Date(0)
@@ -112,7 +112,7 @@ function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray:
     const itemInfo = object[auction.id]
     const price = {
       quantity: auction.quantity,
-      lowestPrice: auction.lowestPrice,
+      lowest: auction.lowest,
       firstQuartile: auction.firstQuartile,
       secondQuartile: auction.secondQuartile,
       date: new Date(auction.lastUpdate)

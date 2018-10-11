@@ -63,10 +63,10 @@ export class Settings {
   }
 
   private static getPriceType(value: string): PriceType {
-    if (value === "lowestPrice" || value === "firstQuartile" || value === "secondQuartile") {
+    if (value === "lowest" || value === "firstQuartile" || value === "secondQuartile") {
       return value
     }
-    return "lowestPrice"
+    return "lowest"
   }
 
   private onPriceTypeChange(craftingProfit: CraftingProfit) {
@@ -78,11 +78,11 @@ export class Settings {
   }
 
   getCraftsPriceType() {
-    return Settings.getPriceType(localStorage.getItem(this.craftsTypeKey) || "lowestPrice")
+    return Settings.getPriceType(localStorage.getItem(this.craftsTypeKey) || "lowest")
   }
 
   getCostPriceType() {
-    return Settings.getPriceType(localStorage.getItem(this.costTypeKey) || "lowestPrice")
+    return Settings.getPriceType(localStorage.getItem(this.costTypeKey) || "lowest")
   }
 
   getAutomaticRefresh() {
