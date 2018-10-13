@@ -1,4 +1,4 @@
-import { Chart, ChartTooltipItem, ChartData } from "chart.js"
+import { Chart, ChartTooltipItem, ChartData, ChartLegendLabelItem } from "chart.js"
 import { ItemInfo } from "./item"
 import { NeverUndefined, NeverNull } from "../utils"
 import { formatMoney } from "./money"
@@ -11,6 +11,18 @@ function toPoints(auctions: AuctionItem[], priceType: PriceType) {
       y: value[priceType]
     }
   })
+}
+
+function isHidden(label: string, defaultValue: boolean): boolean {
+  const settings = localStorage.getItem(`chart.${label}`)
+  if (settings) {
+    return JSON.parse(settings)
+  }
+  return defaultValue
+}
+
+function saveHidden(label: string, hidden: boolean) {
+  localStorage.setItem(`chart.${label}`, JSON.stringify(hidden))
 }
 
 export class History {
@@ -42,25 +54,34 @@ export class History {
     const secondQuartileData = toPoints(item.auctions, "secondQuartile")
     const thirdQuartileData = toPoints(item.auctions, "thirdQuartile")
 
-    const quantityHidden = false
-    const lowestHidden = false
-    const farOutHidden = false
-    const outlierHidden = true
-    const meanHidden = true
-    const firstQuartileHidden = false
-    const secondQuartileHidden = true
-    const thirdQuartileHidden = true
+    const quantityLabel = "Quantity"
+    const lowestLabel = "Lowest"
+    const farOutLabel = "Far out"
+    const outlierLabel = "Outlier"
+    const meanLabel = "Mean"
+    const firstQuartileLabel = "First quartile"
+    const secondQuartileLabel = "Second quartile"
+    const thirdQuartileLabel = "Third quartile"
+
+    const quantityHidden = isHidden(quantityLabel, false)
+    const lowestHidden = isHidden(lowestLabel, false)
+    const farOutHidden = isHidden(farOutLabel, false)
+    const outlierHidden = isHidden(outlierLabel, true)
+    const meanHidden = isHidden(meanLabel, true)
+    const firstQuartileHidden = isHidden(firstQuartileLabel, false)
+    const secondQuartileHidden = isHidden(secondQuartileLabel, true)
+    const thirdQuartileHidden = isHidden(thirdQuartileLabel, true)
 
     if (History.chart) {
       History.chart.destroy()
     }
 
     const pointHitRadius = 5
-    History.chart = new Chart(History.canvas, {
+    const chart = History.chart = new Chart(History.canvas, {
       type: "line",
       data: {
         datasets: [{
-          label: "Quantity",
+          label: quantityLabel,
           data: quantityData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
@@ -70,7 +91,7 @@ export class History {
           fill: false,
           hidden: quantityHidden
         }, {
-          label: "Lowest",
+          label: lowestLabel,
           data: lowestData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
@@ -79,7 +100,7 @@ export class History {
           backgroundColor: "rgba(55, 126, 184, 0.3)",
           hidden: lowestHidden
         }, {
-          label: "Far out",
+          label: farOutLabel,
           data: farOutData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
@@ -88,7 +109,7 @@ export class History {
           backgroundColor: "rgba(102, 166, 30, 0.3)",
           hidden: farOutHidden
         }, {
-          label: "Outlier",
+          label: outlierLabel,
           data: outlierData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
@@ -97,7 +118,7 @@ export class History {
           backgroundColor: "rgba(152, 78, 163, 0.3)",
           hidden: outlierHidden
         }, {
-          label: "Mean",
+          label: meanLabel,
           data: meanData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
@@ -106,7 +127,7 @@ export class History {
           backgroundColor: "rgba(0, 210, 213, 0.3)",
           hidden: meanHidden
         }, {
-          label: "First quartile",
+          label: firstQuartileLabel,
           data: firstQuartileData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
@@ -115,7 +136,7 @@ export class History {
           backgroundColor: "rgba(255, 127, 0, 0.3)",
           hidden: firstQuartileHidden
         }, {
-          label: "Second quartile",
+          label: secondQuartileLabel,
           data: secondQuartileData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
@@ -124,7 +145,7 @@ export class History {
           backgroundColor: "rgba(175, 141, 0, 0.3)",
           hidden: secondQuartileHidden
         }, {
-          label: "Third quartile",
+          label: thirdQuartileLabel,
           data: thirdQuartileData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
@@ -139,7 +160,19 @@ export class History {
           duration: 0
         },
         legend: {
-          display: true
+          display: true,
+          onClick: (event: MouseEvent, legendItem: ChartLegendLabelItem) => {
+            const text = legendItem.text || ""
+            if (text === quantityLabel) {
+              const quantityAxis = NeverUndefined(NeverUndefined(NeverUndefined(chart.config.options).scales).yAxes)[1]
+              quantityAxis.display = !quantityAxis.display
+            }
+            const onClick = NeverUndefined(NeverUndefined(Chart.defaults.global.legend).onClick)
+            onClick.call(this, event, legendItem)
+            const metaHidden = chart.getDatasetMeta(legendItem.datasetIndex).hidden
+            const hidden = (metaHidden === null ? NeverUndefined(chart.data.datasets)[legendItem.datasetIndex].hidden : metaHidden) || false
+            saveHidden(text, hidden)
+          }
         },
         scales: {
           xAxes: [{
@@ -177,7 +210,8 @@ export class History {
               fontColor: History.axisStyle.color || undefined,
               fontFamily: History.axisStyle.fontFamily || undefined,
               fontStyle: History.axisStyle.fontStyle || undefined
-            }
+            },
+            display: !quantityHidden
           }]
         },
         tooltips: {
