@@ -1,6 +1,6 @@
 import { Money, formatMoney } from "./money"
-import { Profit, CostInfo, auctionProfit } from "../index"
-import { Item, Items, ItemInfo, AuctionPrice } from "./item"
+import { Profit, CostInfo, auctionProfit, AuctionSum } from "../index"
+import { Item, Items, ItemInfo } from "./item"
 import { PriceType } from "../types"
 
 export class ProfitDom {
@@ -43,7 +43,7 @@ export class ProfitDom {
         name: item ? item.name : undefined,
         icon: item ? item.icon : undefined,
         quantity: profit.crafts.quantity,
-        auctionPrices: profit.crafts.auctionPrices,
+        auctions: profit.crafts.auctions,
         vendor: item ? (item.price || 0) : 0
       }
     }
@@ -51,7 +51,7 @@ export class ProfitDom {
       name: useNameAndIcon ? profit.name : undefined,
       icon: useNameAndIcon ? profit.icon : undefined,
       quantity: 1,
-      auctionPrices: [],
+      auctions: [],
       vendor: 0
     }
   }
@@ -62,7 +62,7 @@ export class ProfitDom {
       name: item ? item.name : undefined,
       icon: item ? item.icon : undefined,
       quantity: costInfo.quantity,
-      auctionPrices: costInfo.auctionPrices,
+      auctions: costInfo.auctions,
       vendor: item ? (item.price || 0) : 0
     }
   }
@@ -79,8 +79,8 @@ export class ProfitDom {
     return price
   }
 
-  private static getCostPrice(auctionPrice: AuctionPrice, unknown: boolean, priceType: PriceType) {
-    let price = `${formatMoney(auctionPrice[priceType])}`
+  private static getCostPrice(auctionSum: AuctionSum, unknown: boolean, priceType: PriceType) {
+    let price = `${formatMoney(auctionSum[priceType])}`
     if (unknown) {
       price += " + unknown"
     }
@@ -96,34 +96,38 @@ export class ProfitDom {
     this.reagents.update(ProfitDom.itemInfos(profit.cost.reagents))
 
     this.profitItem.update(ProfitDom.craftsItemInfo(profit, false))
-    if (!profit.crafts || profit.crafts.auctionPrices.length === 0) {
+    if (!profit.crafts || profit.crafts.auctions.length === 0) {
       this.profitItem.element.style.display = ""
     } else {
       this.profitItem.element.style.display = "none"
     }
     this.money.update(auctionProfit(profit, craftsPriceType, costPriceType))
     let title = ""
-    if ((profit.crafts && profit.crafts.auctionPrices.length > 0) || profit.cost.auctionPrice[costPriceType]) {
+    if ((profit.crafts && profit.crafts.auctions.length > 0) || profit.cost.auctionSum[costPriceType]) {
       this.money.element.style.display = ""
     } else {
       this.money.element.style.display = "none"
     }
     const unknown = profit.cost.unknown.length > 0
-    if (profit.crafts && profit.crafts.auctionPrices.length > 0) {
-      title += `Profit\nLowest: ${ProfitDom.getProfitPrice(profit, unknown, "lowest", "lowest")}`
-      title += `\n     LQ1: ${ProfitDom.getProfitPrice(profit, unknown, "lowest", "firstQuartile")}`
-      title += `\n     LQ2: ${ProfitDom.getProfitPrice(profit, unknown, "lowest", "secondQuartile")}`
-      title += `\n       Q1: ${ProfitDom.getProfitPrice(profit, unknown, "firstQuartile", "firstQuartile")}`
-      title += `\n  Q1Q2: ${ProfitDom.getProfitPrice(profit, unknown, "firstQuartile", "secondQuartile")}`
-      title += `\n       Q2: ${ProfitDom.getProfitPrice(profit, unknown, "secondQuartile", "secondQuartile")}`
+    if (profit.crafts && profit.crafts.auctions.length > 0) {
+      title += `Profit\nLowest-Lowest:\t${ProfitDom.getProfitPrice(profit, unknown, "lowest", "lowest")}`
+      title += `\nLowest-Far out:\t${ProfitDom.getProfitPrice(profit, unknown, "lowest", "farOut")}`
+      title += `\nLowest-First:    \t${ProfitDom.getProfitPrice(profit, unknown, "lowest", "firstQuartile")}`
+      title += `\nFar out-Lowest:\t${ProfitDom.getProfitPrice(profit, unknown, "farOut", "lowest")}`
+      title += `\nFar out-Far out:\t${ProfitDom.getProfitPrice(profit, unknown, "farOut", "farOut")}`
+      title += `\nFar out-First:    \t${ProfitDom.getProfitPrice(profit, unknown, "farOut", "firstQuartile")}`
     }
-    if (profit.cost.auctionPrice.firstQuartile) {
+    if (profit.cost.auctionSum.firstQuartile) {
       if (title) {
         title += "\n\n"
       }
-      title += `Cost\nLowest: ${ProfitDom.getCostPrice(profit.cost.auctionPrice, unknown, "lowest")}`
-      title += `\n       Q1: ${ProfitDom.getCostPrice(profit.cost.auctionPrice, unknown, "firstQuartile")}`
-      title += `\n       Q2: ${ProfitDom.getCostPrice(profit.cost.auctionPrice, unknown, "secondQuartile")}`
+      title += `Cost\nLowest:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "lowest")}`
+      title += `\nFar out:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "farOut")}`
+      title += `\nOutlier:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "outlier")}`
+      title += `\nMean:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "mean")}`
+      title += `\nFirst: \t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "firstQuartile")}`
+      title += `\nSecond:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "secondQuartile")}`
+      title += `\nThird:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "thirdQuartile")}`
     }
     this.money.element.title = title
     this.unknownCost.update(ProfitDom.itemInfos(profit.cost.unknown))

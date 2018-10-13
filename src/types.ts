@@ -1,12 +1,16 @@
-export type PriceType = "lowest" | "firstQuartile" | "secondQuartile"
+export type PriceType = "lowest" | "farOut" | "outlier" | "mean" | "firstQuartile" | "secondQuartile" | "thirdQuartile"
 
-type AuctionItem = {
+export type AuctionItem = {
   id: number,
+  quantity: number,
+  lastUpdate: string,
   lowest: number,
+  farOut: number,
+  outlier: number,
+  mean: number,
   firstQuartile: number,
   secondQuartile: number,
-  quantity: number,
-  lastUpdate: string
+  thirdQuartile: number
 }
 
 export type AuctionInfo = {

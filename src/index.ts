@@ -1,77 +1,85 @@
 import { ProfitDom } from "./components/profit"
-import { AuctionInfo, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo, PriceType } from "./types"
+import { AuctionInfo, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo, PriceType, AuctionItem } from "./types"
 import { getJson, NeverNull, NeverUndefined } from "./utils"
 import { Update } from "./components/update"
 import { BASE_URL, REALM_ID } from "./constants"
 import { Filters } from "./components/filters"
 import { Settings } from "./components/settings"
-import { AuctionPrice } from "./components/item"
 import { History } from "./components/history"
 
-type AuctionItemInfo = {
-  prices: AuctionPrice[] // Oldest first
-}
-
-type AuctionInfos = { [id: number]: AuctionItemInfo | undefined }
-
-function findAuctionPrices(id: number, auctions: AuctionInfos): AuctionPrice[] {
-  const auction = auctions[id]
-  if (auction) {
-    return auction.prices
-  }
-  return []
-}
+type AuctionInfos = { [id: number]: AuctionItem[] | undefined }
 
 export type CostInfo = {
   item?: ItemInfo,
-  auctionPrices: AuctionPrice[],
+  auctions: AuctionItem[],
   quantity: number
 }
 
 function findCostInfo(crafts: RecipeItem, items: ItemInfos, auctions: AuctionInfos): CostInfo {
   const item = items[crafts.id]
-  const auctionPrices = findAuctionPrices(crafts.id, auctions)
+  const auctionData = auctions[crafts.id] || []
   return {
     item: item,
-    auctionPrices: auctionPrices,
+    auctions: auctionData,
     quantity: crafts.quantity
   }
 }
 
+export type AuctionSum = {
+  lowest: number,
+  farOut: number,
+  outlier: number,
+  mean: number,
+  firstQuartile: number,
+  secondQuartile: number,
+  thirdQuartile: number
+}
+
 type Cost = {
-  auctionPrice: AuctionPrice
+  auctionSum: AuctionSum
   reagents: CostInfo[],
   unknown: CostInfo[]
+}
+
+function calculateCost(costInfo: CostInfo, quantity: number, priceType: PriceType) {
+  const auctions = costInfo.auctions.length
+  return ((costInfo.item ? costInfo.item.price : 0) || (auctions > 0 ? costInfo.auctions[auctions - 1][priceType] : 0)) * quantity
 }
 
 function findCost(recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos) {
   return recipe.reagents.reduce(
     (object: Cost, reagent) => {
       const costInfo = findCostInfo(reagent, items, auctions)
-      const prices = costInfo.auctionPrices.length
-      const lowestCost =
-        ((costInfo.item ? costInfo.item.price : 0) || (prices > 0 ? costInfo.auctionPrices[prices - 1].lowest : 0)) * reagent.quantity
-      const q1Cost =
-        ((costInfo.item ? costInfo.item.price : 0) || (prices > 0 ? costInfo.auctionPrices[prices - 1].firstQuartile : 0)) * reagent.quantity
-      const q2Cost =
-        ((costInfo.item ? costInfo.item.price : 0) || (prices > 0 ? costInfo.auctionPrices[prices - 1].secondQuartile : 0)) * reagent.quantity
+      const lowestCost = calculateCost(costInfo, reagent.quantity, "lowest")
+      const farOutCost = calculateCost(costInfo, reagent.quantity, "farOut")
+      const outlierCost = calculateCost(costInfo, reagent.quantity, "outlier")
+      const meanCost = calculateCost(costInfo, reagent.quantity, "mean")
+      const firstQuartileCost = calculateCost(costInfo, reagent.quantity, "firstQuartile")
+      const secondQuartileCost = calculateCost(costInfo, reagent.quantity, "secondQuartile")
+      const thirdQuartileCost = calculateCost(costInfo, reagent.quantity, "thirdQuartile")
       object.reagents.push(costInfo)
       if (lowestCost) {
-        object.auctionPrice.lowest += lowestCost
-        object.auctionPrice.firstQuartile += q1Cost
-        object.auctionPrice.secondQuartile += q2Cost
+        object.auctionSum.lowest += lowestCost
+        object.auctionSum.farOut += farOutCost
+        object.auctionSum.outlier += outlierCost
+        object.auctionSum.mean += meanCost
+        object.auctionSum.firstQuartile += firstQuartileCost
+        object.auctionSum.secondQuartile += secondQuartileCost
+        object.auctionSum.thirdQuartile += thirdQuartileCost
       } else {
         object.unknown.push(costInfo)
       }
       return object
     },
     {
-      auctionPrice: {
-        quantity: 0,
+      auctionSum: {
         lowest: 0,
+        farOut: 0,
+        outlier: 0,
+        mean: 0,
         firstQuartile: 0,
         secondQuartile: 0,
-        date: new Date(0)
+        thirdQuartile: 0
       },
       reagents: [],
       unknown: []
@@ -90,8 +98,8 @@ export type Profit = {
 
 export function auctionProfit(profit: Profit, craftsPriceType: PriceType, costPriceType: PriceType) {
   return (profit.crafts ?
-    Math.floor((profit.crafts.auctionPrices.length > 0 ?
-      profit.crafts.auctionPrices[profit.crafts.auctionPrices.length - 1][craftsPriceType] : 0) * profit.crafts.quantity * 0.95) : 0) - profit.cost.auctionPrice[costPriceType]
+    Math.floor((profit.crafts.auctions.length > 0 ?
+      profit.crafts.auctions[profit.crafts.auctions.length - 1][craftsPriceType] : 0) * profit.crafts.quantity * 0.95) : 0) - profit.cost.auctionSum[costPriceType]
 }
 
 function calculateProfit(id: number, recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos): Profit {
@@ -110,20 +118,11 @@ function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray:
   // Convert from an array to help with lookups
   const auctions: AuctionInfos = auctionsArray.auctions.reduce((object: AuctionInfos, auction) => {
     const itemInfo = object[auction.id]
-    const price = {
-      quantity: auction.quantity,
-      lowest: auction.lowest,
-      firstQuartile: auction.firstQuartile,
-      secondQuartile: auction.secondQuartile,
-      date: new Date(auction.lastUpdate)
-    }
     if (itemInfo) {
       // Auctions are sorted by date on the server
-      itemInfo.prices.push(price)
+      itemInfo.push(auction)
     } else {
-      object[auction.id] = {
-        prices: [price]
-      }
+      object[auction.id] = [auction]
     }
     return object
   }, {})

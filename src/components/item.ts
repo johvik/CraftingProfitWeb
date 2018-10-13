@@ -1,21 +1,13 @@
 import { formatMoney } from "./money"
 import { NeverUndefined } from "../utils"
-import { PriceType } from "../types"
+import { PriceType, AuctionItem } from "../types"
 import { History } from "./history"
-
-export type AuctionPrice = {
-  quantity: number,
-  date: Date,
-  lowest: number,
-  firstQuartile: number,
-  secondQuartile: number
-}
 
 export type ItemInfo = {
   name?: string,
   icon?: string,
   quantity: number,
-  auctionPrices: AuctionPrice[],
+  auctions: AuctionItem[],
   vendor: number
 }
 
@@ -30,10 +22,10 @@ export class Item {
     this.element.appendChild(this.quantity)
   }
 
-  private static getAuctionPrice(auctionPrice: AuctionPrice, quantity: number, priceType: PriceType) {
-    let price = `${formatMoney(auctionPrice[priceType])}`
+  private static getAuctionPrice(auction: AuctionItem, quantity: number, priceType: PriceType) {
+    let price = `${formatMoney(auction[priceType])}`
     if (quantity > 1) {
-      price += ` (${formatMoney(auctionPrice[priceType] * quantity)})`
+      price += ` (${formatMoney(auction[priceType] * quantity)})`
     }
     return price
   }
@@ -41,16 +33,20 @@ export class Item {
   private static getTitle(item: ItemInfo) {
     let title = item.name || "?"
     if (item.vendor) {
-      title += `\nVendor: ${formatMoney(item.vendor)}`
+      title += `\nVendor:\t${formatMoney(item.vendor)}`
       if (item.quantity > 1) {
         title += ` (${formatMoney(item.vendor * item.quantity)})`
       }
     }
-    const prices = item.auctionPrices.length
-    if (prices > 0) {
-      title += `\nLowest: ${Item.getAuctionPrice(item.auctionPrices[prices - 1], item.quantity, "lowest")}`
-      title += `\n       Q1: ${Item.getAuctionPrice(item.auctionPrices[prices - 1], item.quantity, "firstQuartile")}`
-      title += `\n       Q2: ${Item.getAuctionPrice(item.auctionPrices[prices - 1], item.quantity, "secondQuartile")}`
+    const auctions = item.auctions.length
+    if (auctions > 0) {
+      title += `\nLowest:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "lowest")}`
+      title += `\nFar out:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "farOut")}`
+      title += `\nOutlier:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "outlier")}`
+      title += `\nMean:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "mean")}`
+      title += `\nFirst: \t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "firstQuartile")}`
+      title += `\nSecond:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "secondQuartile")}`
+      title += `\nThird:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "thirdQuartile")}`
     }
     return title
   }
@@ -60,13 +56,13 @@ export class Item {
     const icon = item.icon || "inv_misc_questionmark"
     this.icon.src = `https://wow.zamimg.com/images/wow/icons/medium/${icon}.jpg`
     this.quantity.textContent = item.quantity > 1 ? item.quantity.toString() : ""
-    if (item.auctionPrices.length > 0) {
+    if (item.auctions.length > 0) {
       this.element.classList.add("has-pointer")
     } else {
       this.element.classList.remove("has-pointer")
     }
     this.element.onclick = () => {
-      if (item.auctionPrices.length > 0) {
+      if (item.auctions.length > 0) {
         History.show(item, this.element)
       } else {
         History.hide()

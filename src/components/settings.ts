@@ -63,7 +63,8 @@ export class Settings {
   }
 
   private static getPriceType(value: string): PriceType {
-    if (value === "lowest" || value === "firstQuartile" || value === "secondQuartile") {
+    if (value === "lowest" || value === "farOut" || value === "outlier" || value === "mean" ||
+      value === "firstQuartile" || value === "secondQuartile" || value === "thirdQuartile") {
       return value
     }
     return "lowest"
@@ -82,7 +83,7 @@ export class Settings {
   }
 
   getCostPriceType() {
-    return Settings.getPriceType(localStorage.getItem(this.costTypeKey) || "lowest")
+    return Settings.getPriceType(localStorage.getItem(this.costTypeKey) || "farOut")
   }
 
   getAutomaticRefresh() {

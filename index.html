@@ -138,7 +138,7 @@
         </div>
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label"><abbr title="Auction price to use for crafted items and when calculating the profit of crafted items">Crafts</abbr></label>
+            <label class="label"><abbr title="Auction price to use when calculating the profit of crafted items">Crafts</abbr></label>
           </div>
           <div class="field-body">
             <div class="field">
@@ -146,8 +146,12 @@
                 <div class="select">
                   <select id="crafts-price-type">
                     <option value="lowest">Lowest</option>
+                    <option value="farOut">Far out</option>
+                    <option value="outlier">Outlier</option>
+                    <option value="mean">Mean</option>
                     <option value="firstQuartile">First quartile</option>
                     <option value="secondQuartile">Second quartile</option>
+                    <option value="thirdQuartile">Third quartile</option>
                   </select>
                 </div>
               </div>
@@ -164,8 +168,12 @@
                 <div class="select">
                   <select id="cost-price-type">
                     <option value="lowest">Lowest</option>
+                    <option value="farOut">Far out</option>
+                    <option value="outlier">Outlier</option>
+                    <option value="mean">Mean</option>
                     <option value="firstQuartile">First quartile</option>
                     <option value="secondQuartile">Second quartile</option>
+                    <option value="thirdQuartile">Third quartile</option>
                   </select>
                 </div>
               </div>

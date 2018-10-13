@@ -2,6 +2,16 @@ import { Chart, ChartTooltipItem, ChartData } from "chart.js"
 import { ItemInfo } from "./item"
 import { NeverUndefined, NeverNull } from "../utils"
 import { formatMoney } from "./money"
+import { AuctionItem, PriceType } from "../types"
+
+function toPoints(auctions: AuctionItem[], priceType: PriceType) {
+  return auctions.map(value => {
+    return {
+      x: value.lastUpdate,
+      y: value[priceType]
+    }
+  })
+}
 
 export class History {
   private static readonly container = NeverNull(document.getElementById("history-container"))
@@ -18,30 +28,28 @@ export class History {
     }
     History.lastCaller = caller
 
-    const lowestData = item.auctionPrices.map(value => {
+    const quantityData = item.auctions.map(value => {
       return {
-        x: value.date,
-        y: value.lowest
-      }
-    })
-    const firstQuartileData = item.auctionPrices.map(value => {
-      return {
-        x: value.date,
-        y: value.firstQuartile
-      }
-    })
-    const secondQuartileData = item.auctionPrices.map(value => {
-      return {
-        x: value.date,
-        y: value.secondQuartile
-      }
-    })
-    const quantityData = item.auctionPrices.map(value => {
-      return {
-        x: value.date,
+        x: value.lastUpdate,
         y: value.quantity
       }
     })
+    const lowestData = toPoints(item.auctions, "lowest")
+    const farOutData = toPoints(item.auctions, "farOut")
+    const outlierData = toPoints(item.auctions, "outlier")
+    const meanData = toPoints(item.auctions, "mean")
+    const firstQuartileData = toPoints(item.auctions, "firstQuartile")
+    const secondQuartileData = toPoints(item.auctions, "secondQuartile")
+    const thirdQuartileData = toPoints(item.auctions, "thirdQuartile")
+
+    const quantityHidden = false
+    const lowestHidden = false
+    const farOutHidden = false
+    const outlierHidden = true
+    const meanHidden = true
+    const firstQuartileHidden = false
+    const secondQuartileHidden = true
+    const thirdQuartileHidden = true
 
     if (History.chart) {
       History.chart.destroy()
@@ -57,33 +65,73 @@ export class History {
           lineTension: 0,
           pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-quantity",
-          borderColor: "rgb(196,88,80)",
-          backgroundColor: "rgba(196,88,80,0.3)",
-          fill: false
+          borderColor: "rgb(255, 0, 41)",
+          backgroundColor: "rgba(255, 0, 41, 0.3)",
+          fill: false,
+          hidden: quantityHidden
         }, {
           label: "Lowest",
           data: lowestData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-gold",
-          borderColor: "rgb(62,149,205)",
-          backgroundColor: "rgba(62,149,205,0.3)"
+          borderColor: "rgb(55, 126, 184)",
+          backgroundColor: "rgba(55, 126, 184, 0.3)",
+          hidden: lowestHidden
+        }, {
+          label: "Far out",
+          data: farOutData,
+          lineTension: 0,
+          pointHitRadius: pointHitRadius,
+          yAxisID: "y-axis-gold",
+          borderColor: "rgb(102, 166, 30)",
+          backgroundColor: "rgba(102, 166, 30, 0.3)",
+          hidden: farOutHidden
+        }, {
+          label: "Outlier",
+          data: outlierData,
+          lineTension: 0,
+          pointHitRadius: pointHitRadius,
+          yAxisID: "y-axis-gold",
+          borderColor: "rgb(152, 78, 163)",
+          backgroundColor: "rgba(152, 78, 163, 0.3)",
+          hidden: outlierHidden
+        }, {
+          label: "Mean",
+          data: meanData,
+          lineTension: 0,
+          pointHitRadius: pointHitRadius,
+          yAxisID: "y-axis-gold",
+          borderColor: "rgb(0, 210, 213)",
+          backgroundColor: "rgba(0, 210, 213, 0.3)",
+          hidden: meanHidden
         }, {
           label: "First quartile",
           data: firstQuartileData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-gold",
-          borderColor: "rgb(142,94,162)",
-          backgroundColor: "rgba(142,94,162,0.3)"
+          borderColor: "rgb(255, 127, 0)",
+          backgroundColor: "rgba(255, 127, 0, 0.3)",
+          hidden: firstQuartileHidden
         }, {
           label: "Second quartile",
           data: secondQuartileData,
           lineTension: 0,
           pointHitRadius: pointHitRadius,
           yAxisID: "y-axis-gold",
-          borderColor: "rgb(60,186,159)",
-          backgroundColor: "rgba(60,186,159,0.3)"
+          borderColor: "rgb(175, 141, 0)",
+          backgroundColor: "rgba(175, 141, 0, 0.3)",
+          hidden: secondQuartileHidden
+        }, {
+          label: "Third quartile",
+          data: thirdQuartileData,
+          lineTension: 0,
+          pointHitRadius: pointHitRadius,
+          yAxisID: "y-axis-gold",
+          borderColor: "rgb(127, 128, 205)",
+          backgroundColor: "rgba(127, 128, 205, 0.3)",
+          hidden: thirdQuartileHidden
         }]
       },
       options: {
@@ -91,7 +139,7 @@ export class History {
           duration: 0
         },
         legend: {
-          display: false
+          display: true
         },
         scales: {
           xAxes: [{
