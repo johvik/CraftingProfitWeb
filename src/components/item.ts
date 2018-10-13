@@ -40,13 +40,26 @@ export class Item {
     }
     const auctions = item.auctions.length
     if (auctions > 0) {
-      title += `\nLowest:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "lowest")}`
-      title += `\nFar out:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "farOut")}`
-      title += `\nOutlier:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "outlier")}`
-      title += `\nMean:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "mean")}`
-      title += `\nFirst: \t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "firstQuartile")}`
-      title += `\nSecond:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "secondQuartile")}`
-      title += `\nThird:\t${Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "thirdQuartile")}`
+      const lowest = Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "lowest")
+      title += `\nLowest:\t${lowest}`
+
+      const farOut = Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "farOut")
+      title += `\nFar out:\t${farOut !== lowest ? farOut : "〃"}`
+
+      const outlier = Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "outlier")
+      title += `\nOutlier:\t${outlier !== farOut ? outlier : "〃"}`
+
+      const mean = Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "mean")
+      title += `\nMean:\t${mean !== outlier ? mean : "〃"}`
+
+      const firstQuartile = Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "firstQuartile")
+      title += `\nFirst: \t${firstQuartile !== mean ? firstQuartile : "〃"}`
+
+      const secondQuartile = Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "secondQuartile")
+      title += `\nSecond:\t${secondQuartile !== firstQuartile ? secondQuartile : "〃"}`
+
+      const thirdQuartile = Item.getAuctionPrice(item.auctions[auctions - 1], item.quantity, "thirdQuartile")
+      title += `\nThird:\t${thirdQuartile !== secondQuartile ? thirdQuartile : "〃"}`
     }
     return title
   }

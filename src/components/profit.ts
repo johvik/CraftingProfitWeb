@@ -110,24 +110,49 @@ export class ProfitDom {
     }
     const unknown = profit.cost.unknown.length > 0
     if (profit.crafts && profit.crafts.auctions.length > 0) {
-      title += `Profit\nLowest-Lowest:\t${ProfitDom.getProfitPrice(profit, unknown, "lowest", "lowest")}`
-      title += `\nLowest-Far out:\t${ProfitDom.getProfitPrice(profit, unknown, "lowest", "farOut")}`
-      title += `\nLowest-First:    \t${ProfitDom.getProfitPrice(profit, unknown, "lowest", "firstQuartile")}`
-      title += `\nFar out-Lowest:\t${ProfitDom.getProfitPrice(profit, unknown, "farOut", "lowest")}`
-      title += `\nFar out-Far out:\t${ProfitDom.getProfitPrice(profit, unknown, "farOut", "farOut")}`
-      title += `\nFar out-First:    \t${ProfitDom.getProfitPrice(profit, unknown, "farOut", "firstQuartile")}`
+      // TODO Fix this with ditto
+      const lowestlowest = ProfitDom.getProfitPrice(profit, unknown, "lowest", "lowest")
+      title += `Profit\nLowest-Lowest:\t${lowestlowest}`
+
+      const lowestfarOut = ProfitDom.getProfitPrice(profit, unknown, "lowest", "farOut")
+      title += `\nLowest-Far out:\t${lowestfarOut !== lowestlowest ? lowestfarOut : "〃"}`
+
+      const lowestfirstQuartile = ProfitDom.getProfitPrice(profit, unknown, "lowest", "firstQuartile")
+      title += `\nLowest-First:    \t${lowestfirstQuartile !== lowestfarOut ? lowestfirstQuartile : "〃"}`
+
+      const farOutlowest = ProfitDom.getProfitPrice(profit, unknown, "farOut", "lowest")
+      title += `\nFar out-Lowest:\t${farOutlowest !== lowestfirstQuartile ? farOutlowest : "〃"}`
+
+      const farOutfarOut = ProfitDom.getProfitPrice(profit, unknown, "farOut", "farOut")
+      title += `\nFar out-Far out:\t${farOutfarOut !== farOutlowest ? farOutfarOut : "〃"}`
+
+      const farOutfirstQuartile = ProfitDom.getProfitPrice(profit, unknown, "farOut", "firstQuartile")
+      title += `\nFar out-First:    \t${farOutfirstQuartile !== farOutfarOut ? farOutfirstQuartile : "〃"}`
     }
     if (profit.cost.auctionSum.firstQuartile) {
       if (title) {
         title += "\n\n"
       }
-      title += `Cost\nLowest:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "lowest")}`
-      title += `\nFar out:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "farOut")}`
-      title += `\nOutlier:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "outlier")}`
-      title += `\nMean:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "mean")}`
-      title += `\nFirst: \t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "firstQuartile")}`
-      title += `\nSecond:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "secondQuartile")}`
-      title += `\nThird:\t${ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "thirdQuartile")}`
+      const lowest = ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "lowest")
+      title += `Cost\nLowest:\t${lowest}`
+
+      const farOut = ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "farOut")
+      title += `\nFar out:\t${farOut !== lowest ? farOut : "〃"}`
+
+      const outlier = ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "outlier")
+      title += `\nOutlier:\t${outlier !== farOut ? outlier : "〃"}`
+
+      const mean = ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "mean")
+      title += `\nMean:\t${mean !== outlier ? mean : "〃"}`
+
+      const firstQuartile = ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "firstQuartile")
+      title += `\nFirst: \t${firstQuartile !== mean ? firstQuartile : "〃"}`
+
+      const secondQuartile = ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "secondQuartile")
+      title += `\nSecond:\t${secondQuartile !== firstQuartile ? secondQuartile : "〃"}`
+
+      const thirdQuartile = ProfitDom.getCostPrice(profit.cost.auctionSum, unknown, "thirdQuartile")
+      title += `\nThird:\t${thirdQuartile !== secondQuartile ? thirdQuartile : "〃"}`
     }
     this.money.element.title = title
     this.unknownCost.update(ProfitDom.itemInfos(profit.cost.unknown))
