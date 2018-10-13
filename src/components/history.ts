@@ -172,6 +172,11 @@ export class History {
             const metaHidden = chart.getDatasetMeta(legendItem.datasetIndex).hidden
             const hidden = (metaHidden === null ? NeverUndefined(chart.data.datasets)[legendItem.datasetIndex].hidden : metaHidden) || false
             saveHidden(text, hidden)
+          },
+          labels: {
+            fontColor: History.axisStyle.color || undefined,
+            fontFamily: History.axisStyle.fontFamily || undefined,
+            fontStyle: History.axisStyle.fontStyle || undefined
           }
         },
         scales: {
