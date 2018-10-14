@@ -183,9 +183,9 @@ export class History {
           xAxes: [{
             type: "time",
             time: {
-              unit: "hour",
+              unit: "day",
               displayFormats: {
-                hour: "MMM D HH:mm"
+                day: "MMM D"
               },
               tooltipFormat: "dddd, MMMM D HH:mm",
             },
