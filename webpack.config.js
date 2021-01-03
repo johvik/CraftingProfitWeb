@@ -25,7 +25,7 @@ module.exports = (_, argv) => {
       new CopyWebpackPlugin({ patterns: [{ from: "index.html" }] }),
       new webpack.DefinePlugin({
         GENERATED_CONNECTED_REALM_ID: 1,
-        BASE_URL: JSON.stringify(argv.mode === "production" ? "" : (process.env.BASE_URL || "https://localhost:3000"))
+        API_URL: JSON.stringify(process.env.API_URL || "")
       })
     ],
     output: {
@@ -33,7 +33,13 @@ module.exports = (_, argv) => {
       path: path.resolve(__dirname, "dist")
     },
     devServer: {
-      contentBase: path.join(__dirname, "dist")
+      contentBase: path.join(__dirname, "dist"),
+      proxy: {
+        "/api": {
+          target: process.env.API_URL || "https://localhost:3000",
+          secure: false
+        }
+      }
     }
   }
 }

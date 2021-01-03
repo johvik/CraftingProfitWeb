@@ -2,7 +2,7 @@ import { ProfitDom } from "./components/profit"
 import { AuctionInfo, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo, PriceType, AuctionItem } from "./types"
 import { getJson, NeverNull, NeverUndefined } from "./utils"
 import { Update } from "./components/update"
-import { BASE_URL, GENERATED_CONNECTED_REALM_ID } from "./constants"
+import { API_URL, GENERATED_CONNECTED_REALM_ID } from "./constants"
 import { Filters } from "./components/filters"
 import { Settings } from "./components/settings"
 import { History } from "./components/history"
@@ -165,9 +165,9 @@ export class CraftingProfit {
     const self = this;
     (async function () {
       try {
-        const baseUrl = BASE_URL
-        const auctions = await getJson(baseUrl + "/api/auctions/" + GENERATED_CONNECTED_REALM_ID) as AuctionInfo
-        const data = await getJson(baseUrl + "/api/data") as DataInfo
+        const apiUrl = API_URL
+        const auctions = await getJson(apiUrl + "/api/auctions/" + GENERATED_CONNECTED_REALM_ID) as AuctionInfo
+        const data = await getJson(apiUrl + "/api/data") as DataInfo
         const craftsPriceType: PriceType = self.settings.getCraftsPriceType()
         const costPriceType: PriceType = self.settings.getCostPriceType()
         const profits = calculateProfits(data.recipes, data.items, auctions, craftsPriceType, costPriceType)
