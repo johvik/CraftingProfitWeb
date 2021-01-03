@@ -67,7 +67,12 @@ export class Item {
   update(item: ItemInfo) {
     this.element.title = Item.getTitle(item)
     const icon = item.icon || "inv_misc_questionmark"
-    this.icon.src = `https://wow.zamimg.com/images/wow/icons/medium/${icon}.jpg`
+    if (icon.startsWith('http')) {
+      // Assume that the icon is a URL
+      this.icon.src = icon;
+    } else {
+      this.icon.src = `https://wow.zamimg.com/images/wow/icons/medium/${icon}.jpg`
+    }
     this.quantity.textContent = item.quantity > 1 ? item.quantity.toString() : ""
     if (item.auctions.length > 0) {
       this.element.classList.add("has-pointer")
