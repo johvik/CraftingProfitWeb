@@ -166,8 +166,8 @@ export class CraftingProfit {
     (async function () {
       try {
         const baseUrl = BASE_URL
-        const auctions = await getJson(baseUrl + "/auctions/" + GENERATED_CONNECTED_REALM_ID) as AuctionInfo
-        const data = await getJson(baseUrl + "/data") as DataInfo
+        const auctions = await getJson(baseUrl + "/api/auctions/" + GENERATED_CONNECTED_REALM_ID) as AuctionInfo
+        const data = await getJson(baseUrl + "/api/data") as DataInfo
         const craftsPriceType: PriceType = self.settings.getCraftsPriceType()
         const costPriceType: PriceType = self.settings.getCostPriceType()
         const profits = calculateProfits(data.recipes, data.items, auctions, craftsPriceType, costPriceType)

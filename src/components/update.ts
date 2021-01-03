@@ -49,7 +49,7 @@ export class Update {
     (async function () {
       try {
         const baseUrl = BASE_URL
-        const lastUpdate = await getJson(baseUrl + "/auctions/lastUpdate") as LastUpdate
+        const lastUpdate = await getJson(baseUrl + "/api/auctions/lastUpdate") as LastUpdate
         for (const i of lastUpdate) {
           if (i.id === GENERATED_CONNECTED_REALM_ID) {
             const modified = new Date(i.lastModified)
