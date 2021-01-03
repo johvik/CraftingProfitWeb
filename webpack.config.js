@@ -1,6 +1,6 @@
 const webpack = require("webpack");
 const path = require("path");
-const CleanWebpackPlugin = require("clean-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 require("dotenv").config();
 
@@ -21,8 +21,8 @@ module.exports = (_, argv) => {
       extensions: [".tsx", ".ts", ".js"]
     },
     plugins: [
-      new CleanWebpackPlugin(["dist"]),
-      new CopyWebpackPlugin([{ from: "index.html", to: "" }]),
+      new CleanWebpackPlugin(),
+      new CopyWebpackPlugin({ patterns: [{ from: "index.html" }] }),
       new webpack.DefinePlugin({
         GENERATED_CONNECTED_REALM_ID: 1,
         BASE_URL: JSON.stringify(argv.mode === "production" ? "" : (process.env.BASE_URL || "https://localhost:3000"))
