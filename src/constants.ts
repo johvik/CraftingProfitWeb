@@ -1,8 +1,8 @@
 declare const BASE_URL: string
-declare const REALM_ID: number
+declare const GENERATED_CONNECTED_REALM_ID: number
 
 const _BASE_URL = BASE_URL
-const _REALM_ID = REALM_ID
+const _GENERATED_CONNECTED_REALM_ID = GENERATED_CONNECTED_REALM_ID
 
 export { _BASE_URL as BASE_URL }
-export { _REALM_ID as REALM_ID }
+export { _GENERATED_CONNECTED_REALM_ID as GENERATED_CONNECTED_REALM_ID }

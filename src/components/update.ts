@@ -1,6 +1,6 @@
 import { NeverNull, getJson } from "../utils"
 import { LastUpdate } from "../types"
-import { BASE_URL, REALM_ID } from "../constants"
+import { BASE_URL, GENERATED_CONNECTED_REALM_ID } from "../constants"
 import { CraftingProfit } from "../index"
 import { Settings } from "./settings"
 
@@ -51,7 +51,7 @@ export class Update {
         const baseUrl = BASE_URL
         const lastUpdate = await getJson(baseUrl + "/auctions/lastUpdate") as LastUpdate
         for (const i of lastUpdate) {
-          if (i.id === REALM_ID) {
+          if (i.id === GENERATED_CONNECTED_REALM_ID) {
             const modified = new Date(i.lastModified)
             self.updateContent(self.lastModified.getTime() < modified.getTime())
           }

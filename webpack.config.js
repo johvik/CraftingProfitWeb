@@ -24,7 +24,7 @@ module.exports = (_, argv) => {
       new CleanWebpackPlugin(["dist"]),
       new CopyWebpackPlugin([{ from: "index.html", to: "" }]),
       new webpack.DefinePlugin({
-        REALM_ID: 1,
+        GENERATED_CONNECTED_REALM_ID: 1,
         BASE_URL: JSON.stringify(argv.mode === "production" ? "" : (process.env.BASE_URL || "https://localhost:3000"))
       })
     ],
