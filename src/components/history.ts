@@ -162,8 +162,10 @@ export class History {
         legend: {
           display: true,
           onClick: (event: MouseEvent, legendItem: ChartLegendLabelItem) => {
-            const text = legendItem.text || ""
-            if (text === quantityLabel) {
+            if (legendItem.text === undefined || legendItem.datasetIndex === undefined) {
+              return;
+            }
+            if (legendItem.text === quantityLabel) {
               const quantityAxis = NeverUndefined(NeverUndefined(NeverUndefined(chart.config.options).scales).yAxes)[1]
               quantityAxis.display = !quantityAxis.display
             }
@@ -171,7 +173,7 @@ export class History {
             onClick.call(this, event, legendItem)
             const metaHidden = chart.getDatasetMeta(legendItem.datasetIndex).hidden
             const hidden = (metaHidden === null ? NeverUndefined(chart.data.datasets)[legendItem.datasetIndex].hidden : metaHidden) || false
-            saveHidden(text, hidden)
+            saveHidden(legendItem.text, hidden)
           },
           labels: {
             fontColor: History.axisStyle.color || undefined,
@@ -198,7 +200,7 @@ export class History {
           yAxes: [{
             id: "y-axis-gold",
             ticks: {
-              callback: (value) => {
+              callback: (value: number) => {
                 return `${value / 10000}g`
               },
               fontColor: History.axisStyle.color || undefined,
