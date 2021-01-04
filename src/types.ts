@@ -1,4 +1,4 @@
-export type PriceType = "lowest" | "farOut" | "outlier" | "mean" | "firstQuartile" | "secondQuartile" | "thirdQuartile"
+export type PriceType = 'lowest' | 'farOut' | 'outlier' | 'mean' | 'firstQuartile' | 'secondQuartile' | 'thirdQuartile';
 
 export type AuctionItem = {
   id: number,
@@ -11,24 +11,24 @@ export type AuctionItem = {
   firstQuartile: number,
   secondQuartile: number,
   thirdQuartile: number
-}
+};
 
 export type AuctionInfo = {
   lastModified: string,
   auctions: AuctionItem[]
-}
+};
 
 export type ItemInfo = {
   name: string,
   icon: string,
   updated: string,
   price?: number
-}
+};
 
 export type RecipeItem = {
   id: number,
   quantity: number
-}
+};
 
 export type RecipeInfo = {
   crafts?: RecipeItem,
@@ -37,25 +37,25 @@ export type RecipeInfo = {
   profession: string,
   reagents: RecipeItem[],
   updated: string
-}
+};
 
 export type ItemInfos = {
   [id: number]: ItemInfo | undefined
-}
+};
 
 export type RecipeInfos = {
   [id: number]: RecipeInfo | undefined
-}
+};
 
 export type DataInfo = {
   items: ItemInfos,
   recipes: RecipeInfos
-}
+};
 
 export type LastUpdateInfo = {
   id: number,
   lastAttempt: string,
   lastModified: string
-}
+};
 
-export type LastUpdate = LastUpdateInfo[]
+export type LastUpdate = LastUpdateInfo[];
