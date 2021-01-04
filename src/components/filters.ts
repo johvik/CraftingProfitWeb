@@ -1,8 +1,8 @@
 import { DomData } from '../index';
 import { NeverNull } from '../utils';
-import { History } from './history';
+import History from './history';
 
-export class Filters {
+export default class Filters {
   private readonly domData: DomData[];
 
   private readonly filterName = document.getElementById('filter-name') as HTMLInputElement;

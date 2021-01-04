@@ -1,7 +1,6 @@
 import { formatMoney } from './money';
-import { NeverUndefined } from '../utils';
 import { PriceType, AuctionItem } from '../types';
-import { History } from './history';
+import History from './history';
 
 export type ItemInfo = {
   name?: string,
@@ -88,29 +87,5 @@ export class Item {
         History.hide();
       }
     };
-  }
-}
-
-export class Items {
-  readonly element = document.createElement('span');
-
-  private readonly items: Item[] = [];
-
-  update(itemInfos: ItemInfo[]) {
-    // Reuse old elemets and add new ones if needed
-    while (this.items.length > itemInfos.length) {
-      const item = NeverUndefined(this.items.pop());
-      this.element.removeChild(item.element);
-    }
-    while (this.items.length < itemInfos.length) {
-      const item = new Item();
-      this.items.push(item);
-      this.element.appendChild(item.element);
-    }
-
-    // Update
-    for (let i = 0; i < this.items.length; i++) {
-      this.items[i].update(itemInfos[i]);
-    }
   }
 }

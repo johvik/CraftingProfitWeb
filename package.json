@@ -6,13 +6,16 @@
   "author": "johvik",
   "scripts": {
     "dev": "webpack serve --hot --mode development",
-    "build": "webpack --progress --mode production"
+    "build": "webpack --progress --mode production",
+    "eslint": "eslint . --ext .ts"
+  },
+  "dependencies": {
+    "chart.js": "^2.9.4"
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.29",
     "@typescript-eslint/eslint-plugin": "^4.12.0",
     "@typescript-eslint/parser": "^4.12.0",
-    "chart.js": "^2.9.4",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^7.0.0",
     "dotenv": "^8.2.0",

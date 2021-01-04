@@ -1,9 +1,9 @@
 import { NeverNull } from '../utils';
 import { PriceType } from '../types';
 import { CraftingProfit } from '../index';
-import { History } from './history';
+import History from './history';
 
-export class Settings {
+export default class Settings {
   private readonly settings = NeverNull(document.getElementById('settings'));
 
   private readonly themeKey = 'theme';

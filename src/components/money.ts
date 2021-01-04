@@ -1,16 +1,14 @@
 export function formatMoney(copper: number) {
-  if (isNaN(copper)) {
+  if (Number.isNaN(copper)) {
     return '?g ?s ?c';
   }
   const sign = copper < 0 ? '-' : '';
-  if (copper < 0) {
-    copper = -copper;
-  }
-  const gold = Math.floor(copper / 10000);
-  copper -= gold * 10000;
-  const silver = Math.floor(copper / 100);
-  copper -= silver * 100;
-  return `${sign}${gold}g ${silver}s ${copper}c`;
+  let remainingCopper = Math.abs(copper);
+  const gold = Math.floor(remainingCopper / 10000);
+  remainingCopper -= gold * 10000;
+  const silver = Math.floor(remainingCopper / 100);
+  remainingCopper -= silver * 100;
+  return `${sign}${gold}g ${silver}s ${remainingCopper}c`;
 }
 
 export class Money {

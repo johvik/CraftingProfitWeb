@@ -2,10 +2,11 @@ import { Money, formatMoney } from './money';
 import {
   Profit, CostInfo, auctionProfit, AuctionSum,
 } from '../index';
-import { Item, Items, ItemInfo } from './item';
+import { Item, ItemInfo } from './item';
+import Items from './items';
 import { PriceType } from '../types';
 
-export class ProfitDom {
+export default class ProfitDom {
   readonly element = document.createElement('tr');
 
   private readonly recipe = document.createElement('a');
@@ -80,7 +81,9 @@ export class ProfitDom {
     return costInfos.map(ProfitDom.itemInfo);
   }
 
-  private static getProfitPrice(profit: Profit, unknown: boolean, craftsPriceType: PriceType, costPriceType: PriceType) {
+  private static getProfitPrice(
+    profit: Profit, unknown: boolean, craftsPriceType: PriceType, costPriceType: PriceType,
+  ) {
     let price = `${formatMoney(auctionProfit(profit, craftsPriceType, costPriceType))}`;
     if (unknown) {
       price += ' - unknown';
@@ -112,7 +115,8 @@ export class ProfitDom {
     }
     this.money.update(auctionProfit(profit, craftsPriceType, costPriceType));
     let title = '';
-    if ((profit.crafts && profit.crafts.auctions.length > 0) || profit.cost.auctionSum[costPriceType]) {
+    if ((profit.crafts && profit.crafts.auctions.length > 0)
+        || profit.cost.auctionSum[costPriceType]) {
       this.money.element.style.display = '';
     } else {
       this.money.element.style.display = 'none';

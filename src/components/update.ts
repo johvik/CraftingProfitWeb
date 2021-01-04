@@ -2,9 +2,9 @@ import { NeverNull, getJson } from '../utils';
 import { LastUpdate } from '../types';
 import { API_URL, GENERATED_CONNECTED_REALM_ID } from '../constants';
 import { CraftingProfit } from '../index';
-import { Settings } from './settings';
+import Settings from './settings';
 
-export class Update {
+export default class Update {
   private readonly updated = NeverNull(document.getElementById('updated'));
 
   private readonly refresh = document.getElementById('refresh') as HTMLAnchorElement;

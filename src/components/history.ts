@@ -25,7 +25,7 @@ function saveHidden(label: string, hidden: boolean) {
   localStorage.setItem(`chart.${label}`, JSON.stringify(hidden));
 }
 
-export class History {
+export default class History {
   private static readonly container = NeverNull(document.getElementById('history-container'));
 
   private static readonly axisStyle = window.getComputedStyle(NeverNull(document.getElementById('history-axis-style')));
@@ -42,7 +42,8 @@ export class History {
 
   static show(item: ItemInfo, caller: HTMLElement) {
     if (caller === History.lastCaller) {
-      return History.hide();
+      History.hide();
+      return;
     }
     History.lastCaller = caller;
 
@@ -81,7 +82,7 @@ export class History {
     }
 
     const pointHitRadius = 5;
-    const chart = History.chart = new Chart(History.canvas, {
+    const newChart = new Chart(History.canvas, {
       type: 'line',
       data: {
         datasets: [{
@@ -167,14 +168,18 @@ export class History {
           display: true,
           onClick: (event: MouseEvent, legendItem: ChartLegendLabelItem) => {
             if (legendItem.text === quantityLabel) {
-              const quantityAxis = NeverUndefined(NeverUndefined(NeverUndefined(chart.config.options).scales).yAxes)[1];
+              const quantityAxis = NeverUndefined(
+                NeverUndefined(NeverUndefined(newChart.config.options).scales).yAxes,
+              )[1];
               quantityAxis.display = !quantityAxis.display;
             }
             const onClick = NeverUndefined(NeverUndefined(Chart.defaults.global.legend).onClick);
             onClick.call(this, event, legendItem);
             if (legendItem.text !== undefined && legendItem.datasetIndex !== undefined) {
-              const metaHidden = chart.getDatasetMeta(legendItem.datasetIndex).hidden;
-              const hidden = (metaHidden === null ? NeverUndefined(chart.data.datasets)[legendItem.datasetIndex].hidden : metaHidden) || false;
+              const metaHidden = newChart.getDatasetMeta(legendItem.datasetIndex).hidden;
+              const hidden = (metaHidden === null
+                ? NeverUndefined(newChart.data.datasets)[legendItem.datasetIndex].hidden
+                : metaHidden) || false;
               saveHidden(legendItem.text, hidden);
             }
           },
@@ -236,7 +241,9 @@ export class History {
           mode: 'x',
           callbacks: {
             labelColor: (tooltipItem: ChartTooltipItem, chart: Chart) => {
-              const dataset = NeverUndefined(chart.data.datasets)[NeverUndefined(tooltipItem.datasetIndex)];
+              const dataset = NeverUndefined(
+                chart.data.datasets,
+              )[NeverUndefined(tooltipItem.datasetIndex)];
               const color = dataset.borderColor as string;
               return {
                 borderColor: color,
@@ -244,7 +251,9 @@ export class History {
               };
             },
             label: (tooltipItem: ChartTooltipItem, data: ChartData) => {
-              const dataset = NeverUndefined(data.datasets)[NeverUndefined(tooltipItem.datasetIndex)];
+              const dataset = NeverUndefined(
+                data.datasets,
+              )[NeverUndefined(tooltipItem.datasetIndex)];
               let label = dataset.label || '';
               if (label) {
                 label += ': ';
@@ -261,6 +270,7 @@ export class History {
       },
     });
 
+    History.chart = newChart;
     History.title.textContent = item.name || '';
     History.container.style.display = '';
 

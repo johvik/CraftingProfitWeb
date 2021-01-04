@@ -1,13 +1,21 @@
-import { ProfitDom } from './components/profit';
+import ProfitDom from './components/profit';
 import {
-  AuctionInfo, DataInfo, RecipeInfos, ItemInfos, RecipeInfo, RecipeItem, ItemInfo, PriceType, AuctionItem,
+  AuctionInfo,
+  DataInfo,
+  RecipeInfos,
+  ItemInfos,
+  RecipeInfo,
+  RecipeItem,
+  ItemInfo,
+  PriceType,
+  AuctionItem,
 } from './types';
 import { getJson, NeverNull, NeverUndefined } from './utils';
-import { Update } from './components/update';
+import Update from './components/update';
 import { API_URL, GENERATED_CONNECTED_REALM_ID } from './constants';
-import { Filters } from './components/filters';
-import { Settings } from './components/settings';
-import { History } from './components/history';
+import Filters from './components/filters';
+import Settings from './components/settings';
+import History from './components/history';
 
 type AuctionInfos = { [id: number]: AuctionItem[] | undefined };
 
@@ -45,7 +53,8 @@ type Cost = {
 
 function calculateCost(costInfo: CostInfo, quantity: number, priceType: PriceType) {
   const auctions = costInfo.auctions.length;
-  return ((costInfo.item ? costInfo.item.price : 0) || (auctions > 0 ? costInfo.auctions[auctions - 1][priceType] : 0)) * quantity;
+  return ((costInfo.item ? costInfo.item.price : 0)
+   || (auctions > 0 ? costInfo.auctions[auctions - 1][priceType] : 0)) * quantity;
 }
 
 function findCost(recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos) {
@@ -98,13 +107,18 @@ export type Profit = {
   cost: Cost,
 };
 
-export function auctionProfit(profit: Profit, craftsPriceType: PriceType, costPriceType: PriceType) {
+export function auctionProfit(
+  profit: Profit, craftsPriceType: PriceType, costPriceType: PriceType,
+) {
   return (profit.crafts
     ? Math.floor((profit.crafts.auctions.length > 0
-      ? profit.crafts.auctions[profit.crafts.auctions.length - 1][craftsPriceType] : 0) * profit.crafts.quantity * 0.95) : 0) - profit.cost.auctionSum[costPriceType];
+      ? profit.crafts.auctions[profit.crafts.auctions.length - 1][craftsPriceType] : 0)
+      * profit.crafts.quantity * 0.95) : 0) - profit.cost.auctionSum[costPriceType];
 }
 
-function calculateProfit(id: number, recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos): Profit {
+function calculateProfit(
+  id: number, recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos,
+): Profit {
   const crafts = recipe.crafts ? findCostInfo(recipe.crafts, items, auctions) : undefined;
   return {
     id,
@@ -116,7 +130,13 @@ function calculateProfit(id: number, recipe: RecipeInfo, items: ItemInfos, aucti
   };
 }
 
-function calculateProfits(recipes: RecipeInfos, items: ItemInfos, auctionsArray: AuctionInfo, craftsPriceType: PriceType, costPriceType: PriceType) {
+function calculateProfits(
+  recipes: RecipeInfos,
+  items: ItemInfos,
+  auctionsArray: AuctionInfo,
+  craftsPriceType: PriceType,
+  costPriceType: PriceType,
+) {
   // Convert from an array to help with lookups
   const auctions: AuctionInfos = auctionsArray.auctions.reduce((object: AuctionInfos, auction) => {
     const itemInfo = object[auction.id];
@@ -175,7 +195,9 @@ export class CraftingProfit {
         const data = await getJson(`${apiUrl}/api/data`) as DataInfo;
         const craftsPriceType: PriceType = self.settings.getCraftsPriceType();
         const costPriceType: PriceType = self.settings.getCostPriceType();
-        const profits = calculateProfits(data.recipes, data.items, auctions, craftsPriceType, costPriceType);
+        const profits = calculateProfits(
+          data.recipes, data.items, auctions, craftsPriceType, costPriceType,
+        );
         self.update.success(new Date(auctions.lastModified));
         self.updateRecipes(profits);
         self.filters.apply();
@@ -197,7 +219,7 @@ export class CraftingProfit {
     while (this.domData.length > profits.length) {
       this.domData.pop();
     }
-    for (let i = 0; i < profits.length; i++) {
+    for (let i = 0; i < profits.length; i += 1) {
       if (this.domData.length <= i) {
         this.domData.push({
           profit: profits[i],
