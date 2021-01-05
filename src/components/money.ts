@@ -1,8 +1,8 @@
 export function formatMoney(copper: number) {
   if (Number.isNaN(copper)) {
-    return '?g ?s ?c';
+    return "?g ?s ?c";
   }
-  const sign = copper < 0 ? '-' : '';
+  const sign = copper < 0 ? "-" : "";
   let remainingCopper = Math.abs(copper);
   const gold = Math.floor(remainingCopper / 10000);
   remainingCopper -= gold * 10000;
@@ -12,7 +12,7 @@ export function formatMoney(copper: number) {
 }
 
 export class Money {
-  readonly element = document.createElement('span');
+  readonly element = document.createElement("span");
 
   update(copper: number) {
     this.element.textContent = formatMoney(copper);

@@ -1,23 +1,29 @@
-import { DomData } from '../index';
-import { NeverNull } from '../utils';
-import History from './history';
+import { DomData } from "../index";
+import { NeverNull } from "../utils";
+import History from "./history";
 
 export default class Filters {
   private readonly domData: DomData[];
 
-  private readonly filterName = document.getElementById('filter-name') as HTMLInputElement;
+  private readonly filterName = document.getElementById(
+    "filter-name"
+  ) as HTMLInputElement;
 
-  private readonly allCheckbox = document.querySelector('#filters a') as HTMLElement;
+  private readonly allCheckbox = document.querySelector(
+    "#filters a"
+  ) as HTMLElement;
 
-  private readonly checkboxes = document.querySelectorAll('#filters a');
+  private readonly checkboxes = document.querySelectorAll("#filters a");
 
-  private readonly emptyInfo = document.getElementById('empty-info') as HTMLElement;
+  private readonly emptyInfo = document.getElementById(
+    "empty-info"
+  ) as HTMLElement;
 
-  private static readonly nameKey = 'name';
+  private static readonly nameKey = "name";
 
-  private static readonly professionsKey = 'professions';
+  private static readonly professionsKey = "professions";
 
-  private static readonly selectAllFilter = 'select all';
+  private static readonly selectAllFilter = "select all";
 
   constructor(domData: DomData[]) {
     this.domData = domData;
@@ -48,14 +54,14 @@ export default class Filters {
 
   private static setChecked(checked: boolean, element: HTMLElement) {
     if (checked) {
-      element.classList.remove('unchecked');
+      element.classList.remove("unchecked");
     } else {
-      element.classList.add('unchecked');
+      element.classList.add("unchecked");
     }
   }
 
   private static isChecked(element: HTMLElement) {
-    return !element.classList.contains('unchecked');
+    return !element.classList.contains("unchecked");
   }
 
   private static getProfessionFilter(element: HTMLElement) {
@@ -100,7 +106,10 @@ export default class Filters {
       }
       Filters.setChecked(!allUnchecked, this.allCheckbox);
     }
-    localStorage.setItem(Filters.professionsKey, JSON.stringify(this.professionFilters()));
+    localStorage.setItem(
+      Filters.professionsKey,
+      JSON.stringify(this.professionFilters())
+    );
     this.apply();
   }
 
@@ -117,27 +126,30 @@ export default class Filters {
   }
 
   apply() {
-    const nameFilter = new RegExp(this.filterName.value, 'i');
+    const nameFilter = new RegExp(this.filterName.value, "i");
     const professionFilters = this.professionFilters();
 
     History.hide();
 
     let lastElement: HTMLElement | undefined;
     for (const i of this.domData) {
-      if ((i.dom.element.innerHTML || '').search(nameFilter) !== -1 && professionFilters.some((value) => value === i.profit.profession)) {
+      if (
+        (i.dom.element.innerHTML || "").search(nameFilter) !== -1 &&
+        professionFilters.some((value) => value === i.profit.profession)
+      ) {
         lastElement = i.dom.element;
-        i.dom.element.style.display = '';
-        i.dom.element.classList.remove('last-row');
+        i.dom.element.style.display = "";
+        i.dom.element.classList.remove("last-row");
       } else {
-        i.dom.element.style.display = 'none';
+        i.dom.element.style.display = "none";
       }
     }
 
     if (lastElement) {
-      this.emptyInfo.style.display = 'none';
-      lastElement.classList.add('last-row');
+      this.emptyInfo.style.display = "none";
+      lastElement.classList.add("last-row");
     } else {
-      this.emptyInfo.style.display = '';
+      this.emptyInfo.style.display = "";
     }
   }
 }

@@ -1,4 +1,4 @@
-import ProfitDom from './components/profit';
+import ProfitDom from "./components/profit";
 import {
   AuctionInfo,
   DataInfo,
@@ -9,23 +9,27 @@ import {
   ItemInfo,
   PriceType,
   AuctionItem,
-} from './types';
-import { getJson, NeverNull, NeverUndefined } from './utils';
-import Update from './components/update';
-import { API_URL, GENERATED_CONNECTED_REALM_ID } from './constants';
-import Filters from './components/filters';
-import Settings from './components/settings';
-import History from './components/history';
+} from "./types";
+import { getJson, NeverNull, NeverUndefined } from "./utils";
+import Update from "./components/update";
+import { API_URL, GENERATED_CONNECTED_REALM_ID } from "./constants";
+import Filters from "./components/filters";
+import Settings from "./components/settings";
+import History from "./components/history";
 
 type AuctionInfos = { [id: number]: AuctionItem[] | undefined };
 
 export type CostInfo = {
-  item?: ItemInfo,
-  auctions: AuctionItem[],
-  quantity: number
+  item?: ItemInfo;
+  auctions: AuctionItem[];
+  quantity: number;
 };
 
-function findCostInfo(crafts: RecipeItem, items: ItemInfos, auctions: AuctionInfos): CostInfo {
+function findCostInfo(
+  crafts: RecipeItem,
+  items: ItemInfos,
+  auctions: AuctionInfos
+): CostInfo {
   const item = items[crafts.id];
   const auctionData = auctions[crafts.id] || [];
   return {
@@ -36,38 +40,61 @@ function findCostInfo(crafts: RecipeItem, items: ItemInfos, auctions: AuctionInf
 }
 
 export type AuctionSum = {
-  lowest: number,
-  farOut: number,
-  outlier: number,
-  mean: number,
-  firstQuartile: number,
-  secondQuartile: number,
-  thirdQuartile: number
+  lowest: number;
+  farOut: number;
+  outlier: number;
+  mean: number;
+  firstQuartile: number;
+  secondQuartile: number;
+  thirdQuartile: number;
 };
 
 type Cost = {
-  auctionSum: AuctionSum
-  reagents: CostInfo[],
-  unknown: CostInfo[]
+  auctionSum: AuctionSum;
+  reagents: CostInfo[];
+  unknown: CostInfo[];
 };
 
-function calculateCost(costInfo: CostInfo, quantity: number, priceType: PriceType) {
+function calculateCost(
+  costInfo: CostInfo,
+  quantity: number,
+  priceType: PriceType
+) {
   const auctions = costInfo.auctions.length;
-  return ((costInfo.item ? costInfo.item.price : 0)
-   || (auctions > 0 ? costInfo.auctions[auctions - 1][priceType] : 0)) * quantity;
+  return (
+    ((costInfo.item ? costInfo.item.price : 0) ||
+      (auctions > 0 ? costInfo.auctions[auctions - 1][priceType] : 0)) *
+    quantity
+  );
 }
 
-function findCost(recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos) {
+function findCost(
+  recipe: RecipeInfo,
+  items: ItemInfos,
+  auctions: AuctionInfos
+) {
   return recipe.reagents.reduce(
     (object: Cost, reagent) => {
       const costInfo = findCostInfo(reagent, items, auctions);
-      const lowestCost = calculateCost(costInfo, reagent.quantity, 'lowest');
-      const farOutCost = calculateCost(costInfo, reagent.quantity, 'farOut');
-      const outlierCost = calculateCost(costInfo, reagent.quantity, 'outlier');
-      const meanCost = calculateCost(costInfo, reagent.quantity, 'mean');
-      const firstQuartileCost = calculateCost(costInfo, reagent.quantity, 'firstQuartile');
-      const secondQuartileCost = calculateCost(costInfo, reagent.quantity, 'secondQuartile');
-      const thirdQuartileCost = calculateCost(costInfo, reagent.quantity, 'thirdQuartile');
+      const lowestCost = calculateCost(costInfo, reagent.quantity, "lowest");
+      const farOutCost = calculateCost(costInfo, reagent.quantity, "farOut");
+      const outlierCost = calculateCost(costInfo, reagent.quantity, "outlier");
+      const meanCost = calculateCost(costInfo, reagent.quantity, "mean");
+      const firstQuartileCost = calculateCost(
+        costInfo,
+        reagent.quantity,
+        "firstQuartile"
+      );
+      const secondQuartileCost = calculateCost(
+        costInfo,
+        reagent.quantity,
+        "secondQuartile"
+      );
+      const thirdQuartileCost = calculateCost(
+        costInfo,
+        reagent.quantity,
+        "thirdQuartile"
+      );
       object.reagents.push(costInfo);
       if (lowestCost) {
         object.auctionSum.lowest += lowestCost;
@@ -94,32 +121,48 @@ function findCost(recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos) 
       },
       reagents: [],
       unknown: [],
-    },
+    }
   );
 }
 
 export type Profit = {
-  id: number,
-  name: string,
-  icon: string,
-  profession: string,
-  crafts?: CostInfo,
-  cost: Cost,
+  id: number;
+  name: string;
+  icon: string;
+  profession: string;
+  crafts?: CostInfo;
+  cost: Cost;
 };
 
 export function auctionProfit(
-  profit: Profit, craftsPriceType: PriceType, costPriceType: PriceType,
+  profit: Profit,
+  craftsPriceType: PriceType,
+  costPriceType: PriceType
 ) {
-  return (profit.crafts
-    ? Math.floor((profit.crafts.auctions.length > 0
-      ? profit.crafts.auctions[profit.crafts.auctions.length - 1][craftsPriceType] : 0)
-      * profit.crafts.quantity * 0.95) : 0) - profit.cost.auctionSum[costPriceType];
+  return (
+    (profit.crafts
+      ? Math.floor(
+          (profit.crafts.auctions.length > 0
+            ? profit.crafts.auctions[profit.crafts.auctions.length - 1][
+                craftsPriceType
+              ]
+            : 0) *
+            profit.crafts.quantity *
+            0.95
+        )
+      : 0) - profit.cost.auctionSum[costPriceType]
+  );
 }
 
 function calculateProfit(
-  id: number, recipe: RecipeInfo, items: ItemInfos, auctions: AuctionInfos,
+  id: number,
+  recipe: RecipeInfo,
+  items: ItemInfos,
+  auctions: AuctionInfos
 ): Profit {
-  const crafts = recipe.crafts ? findCostInfo(recipe.crafts, items, auctions) : undefined;
+  const crafts = recipe.crafts
+    ? findCostInfo(recipe.crafts, items, auctions)
+    : undefined;
   return {
     id,
     name: recipe.name,
@@ -135,19 +178,22 @@ function calculateProfits(
   items: ItemInfos,
   auctionsArray: AuctionInfo,
   craftsPriceType: PriceType,
-  costPriceType: PriceType,
+  costPriceType: PriceType
 ) {
   // Convert from an array to help with lookups
-  const auctions: AuctionInfos = auctionsArray.auctions.reduce((object: AuctionInfos, auction) => {
-    const itemInfo = object[auction.id];
-    if (itemInfo) {
-      // Auctions are sorted by date on the server
-      itemInfo.push(auction);
-    } else {
-      object[auction.id] = [auction];
-    }
-    return object;
-  }, {});
+  const auctions: AuctionInfos = auctionsArray.auctions.reduce(
+    (object: AuctionInfos, auction) => {
+      const itemInfo = object[auction.id];
+      if (itemInfo) {
+        // Auctions are sorted by date on the server
+        itemInfo.push(auction);
+      } else {
+        object[auction.id] = [auction];
+      }
+      return object;
+    },
+    {}
+  );
   const profits: Profit[] = [];
 
   for (const key in recipes) {
@@ -173,8 +219,8 @@ function calculateProfits(
 }
 
 export type DomData = {
-  profit: Profit,
-  dom: ProfitDom
+  profit: Profit;
+  dom: ProfitDom;
 };
 
 export class CraftingProfit {
@@ -191,27 +237,33 @@ export class CraftingProfit {
     (async function () {
       try {
         const apiUrl = API_URL;
-        const auctions = await getJson(`${apiUrl}/api/auctions/${GENERATED_CONNECTED_REALM_ID}`) as AuctionInfo;
-        const data = await getJson(`${apiUrl}/api/data`) as DataInfo;
+        const auctions = (await getJson(
+          `${apiUrl}/api/auctions/${GENERATED_CONNECTED_REALM_ID}`
+        )) as AuctionInfo;
+        const data = (await getJson(`${apiUrl}/api/data`)) as DataInfo;
         const craftsPriceType: PriceType = self.settings.getCraftsPriceType();
         const costPriceType: PriceType = self.settings.getCostPriceType();
         const profits = calculateProfits(
-          data.recipes, data.items, auctions, craftsPriceType, costPriceType,
+          data.recipes,
+          data.items,
+          auctions,
+          craftsPriceType,
+          costPriceType
         );
         self.update.success(new Date(auctions.lastModified));
         self.updateRecipes(profits);
         self.filters.apply();
       } catch (error) {
-        console.error('Failed to get data', error);
+        console.error("Failed to get data", error);
         self.update.error();
       }
       self.update.done();
-    }());
+    })();
   }
 
   private updateRecipes(profits: Profit[]) {
     History.hide();
-    const recipesBody = NeverNull(document.getElementById('recipes'));
+    const recipesBody = NeverNull(document.getElementById("recipes"));
 
     while (recipesBody.lastChild) {
       recipesBody.removeChild(recipesBody.lastChild);

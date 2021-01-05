@@ -14,8 +14,8 @@ export async function getJson(url: string) {
     xhr.onerror = onFailure;
     xhr.onabort = onFailure;
 
-    xhr.open('GET', url);
-    xhr.responseType = 'json';
+    xhr.open("GET", url);
+    xhr.responseType = "json";
     xhr.send();
   });
 }

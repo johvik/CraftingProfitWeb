@@ -1,8 +1,8 @@
-import { NeverUndefined } from '../utils';
-import { Item, ItemInfo } from './item';
+import { NeverUndefined } from "../utils";
+import { Item, ItemInfo } from "./item";
 
 export default class Items {
-  readonly element = document.createElement('span');
+  readonly element = document.createElement("span");
 
   private readonly items: Item[] = [];
 
