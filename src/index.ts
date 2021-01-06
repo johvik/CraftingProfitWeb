@@ -15,8 +15,6 @@ import Filters from "./components/filters";
 import Settings from "./components/settings";
 import History from "./components/history";
 
-type AuctionInfos = { [id: number]: AuctionItem[] | undefined };
-
 export type CostInfo = {
   item?: ItemInfo;
   auctions: AuctionItem[];
@@ -26,10 +24,10 @@ export type CostInfo = {
 function findCostInfo(
   crafts: RecipeItem,
   items: Map<number, ItemInfo>,
-  auctions: AuctionInfos
+  auctions: Map<number, AuctionItem[]>
 ): CostInfo {
   const item = items.get(crafts.id);
-  const auctionData = auctions[crafts.id] || [];
+  const auctionData = auctions.get(crafts.id) || [];
   return {
     item,
     auctions: auctionData,
@@ -69,7 +67,7 @@ function calculateCost(
 function findCost(
   recipe: RecipeInfo,
   items: Map<number, ItemInfo>,
-  auctions: AuctionInfos
+  auctions: Map<number, AuctionItem[]>
 ) {
   return recipe.reagents.reduce(
     (object: Cost, reagent) => {
@@ -156,7 +154,7 @@ function calculateProfit(
   id: number,
   recipe: RecipeInfo,
   items: Map<number, ItemInfo>,
-  auctions: AuctionInfos
+  auctions: Map<number, AuctionItem[]>
 ): Profit {
   const crafts = recipe.crafts
     ? findCostInfo(recipe.crafts, items, auctions)
@@ -179,19 +177,16 @@ function calculateProfits(
   costPriceType: PriceType
 ) {
   // Convert from an array to help with lookups
-  const auctions: AuctionInfos = auctionsArray.auctions.reduce(
-    (object: AuctionInfos, auction) => {
-      const itemInfo = object[auction.id];
-      if (itemInfo) {
-        // Auctions are sorted by date on the server
-        itemInfo.push(auction);
-      } else {
-        object[auction.id] = [auction];
-      }
-      return object;
-    },
-    {}
-  );
+  const auctions = new Map<number, AuctionItem[]>();
+  auctionsArray.auctions.forEach((auction) => {
+    const itemInfo = auctions.get(auction.id);
+    if (itemInfo) {
+      // Auctions are sorted by date on the server
+      itemInfo.push(auction);
+    } else {
+      auctions.set(auction.id, [auction]);
+    }
+  });
   const profits = [...recipes].map(([key, recipe]) =>
     calculateProfit(key, recipe, items, auctions)
   );
