@@ -46,17 +46,9 @@ export type RecipeInfo = {
   updated: string;
 };
 
-export type ItemInfos = {
-  [id: number]: ItemInfo | undefined;
-};
-
-export type RecipeInfos = {
-  [id: number]: RecipeInfo | undefined;
-};
-
 export type DataInfo = {
-  items: ItemInfos;
-  recipes: RecipeInfos;
+  items: [number, ItemInfo][];
+  recipes: [number, RecipeInfo][];
 };
 
 export type LastUpdateInfo = {

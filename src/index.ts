@@ -2,15 +2,13 @@ import ProfitDom from "./components/profit";
 import {
   AuctionInfo,
   DataInfo,
-  RecipeInfos,
-  ItemInfos,
   RecipeInfo,
   RecipeItem,
   ItemInfo,
   PriceType,
   AuctionItem,
 } from "./types";
-import { getJson, NeverNull, NeverUndefined } from "./utils";
+import { getJson, NeverNull } from "./utils";
 import Update from "./components/update";
 import { API_URL, GENERATED_CONNECTED_REALM_ID } from "./constants";
 import Filters from "./components/filters";
@@ -27,10 +25,10 @@ export type CostInfo = {
 
 function findCostInfo(
   crafts: RecipeItem,
-  items: ItemInfos,
+  items: Map<number, ItemInfo>,
   auctions: AuctionInfos
 ): CostInfo {
-  const item = items[crafts.id];
+  const item = items.get(crafts.id);
   const auctionData = auctions[crafts.id] || [];
   return {
     item,
@@ -70,7 +68,7 @@ function calculateCost(
 
 function findCost(
   recipe: RecipeInfo,
-  items: ItemInfos,
+  items: Map<number, ItemInfo>,
   auctions: AuctionInfos
 ) {
   return recipe.reagents.reduce(
@@ -157,7 +155,7 @@ export function auctionProfit(
 function calculateProfit(
   id: number,
   recipe: RecipeInfo,
-  items: ItemInfos,
+  items: Map<number, ItemInfo>,
   auctions: AuctionInfos
 ): Profit {
   const crafts = recipe.crafts
@@ -174,8 +172,8 @@ function calculateProfit(
 }
 
 function calculateProfits(
-  recipes: RecipeInfos,
-  items: ItemInfos,
+  recipes: Map<number, RecipeInfo>,
+  items: Map<number, ItemInfo>,
   auctionsArray: AuctionInfo,
   craftsPriceType: PriceType,
   costPriceType: PriceType
@@ -194,12 +192,9 @@ function calculateProfits(
     },
     {}
   );
-  const profits: Profit[] = [];
-
-  for (const key in recipes) {
-    const recipe = NeverUndefined(recipes[key]);
-    profits.push(calculateProfit(Number(key), recipe, items, auctions));
-  }
+  const profits = [...recipes].map(([key, recipe]) =>
+    calculateProfit(key, recipe, items, auctions)
+  );
 
   // Sort by: number of unknowns, profit, id
   profits.sort((a, b) => {
@@ -241,11 +236,13 @@ export class CraftingProfit {
           `${apiUrl}/api/auctions/${GENERATED_CONNECTED_REALM_ID}`
         )) as AuctionInfo;
         const data = (await getJson(`${apiUrl}/api/data`)) as DataInfo;
+        const items = new Map(data.items);
+        const recipes = new Map(data.recipes);
         const craftsPriceType: PriceType = self.settings.getCraftsPriceType();
         const costPriceType: PriceType = self.settings.getCostPriceType();
         const profits = calculateProfits(
-          data.recipes,
-          data.items,
+          recipes,
+          items,
           auctions,
           craftsPriceType,
           costPriceType
