@@ -22,6 +22,5 @@ module.exports = {
     "import/no-cycle": "warn",
     // TODO: Review these:
     "no-restricted-syntax": "off",
-    "prefer-promise-reject-errors": "off",
   },
 };

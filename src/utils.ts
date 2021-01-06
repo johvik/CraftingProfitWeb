@@ -5,11 +5,11 @@ export async function getJson(url: string) {
       if (xhr.status === 200) {
         return resolve(xhr.response);
       }
-      return reject(`Status not OK ${xhr.status}`);
+      return reject(new Error(`Status not OK ${xhr.status}`));
     };
 
     function onFailure(evt: ProgressEvent) {
-      return reject(`Error ${evt}`);
+      return reject(new Error(`Error ${evt}`));
     }
     xhr.onerror = onFailure;
     xhr.onabort = onFailure;
