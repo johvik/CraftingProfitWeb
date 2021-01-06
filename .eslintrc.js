@@ -21,7 +21,6 @@ module.exports = {
     // TODO: Fix these:
     "import/no-cycle": "warn",
     // TODO: Review these:
-    "guard-for-in": "off",
     "no-restricted-syntax": "off",
     "prefer-promise-reject-errors": "off",
   },
