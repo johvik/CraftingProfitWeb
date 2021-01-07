@@ -20,7 +20,5 @@ module.exports = {
     "no-param-reassign": ["error", { props: false }],
     // TODO: Fix these:
     "import/no-cycle": "warn",
-    // TODO: Review these:
-    "no-restricted-syntax": "off",
   },
 };

@@ -13,7 +13,9 @@ export default class Filters {
     "#filters a"
   ) as HTMLElement;
 
-  private readonly checkboxes = document.querySelectorAll("#filters a");
+  private readonly checkboxes = document.querySelectorAll<HTMLElement>(
+    "#filters a"
+  );
 
   private readonly emptyInfo = document.getElementById(
     "empty-info"
@@ -42,14 +44,13 @@ export default class Filters {
       this.apply();
     };
 
-    for (const i of this.checkboxes) {
-      const checkbox = i as HTMLElement;
+    this.checkboxes.forEach((checkbox) => {
       checkbox.onclick = (event: Event) => {
         const element = event.srcElement as HTMLElement;
         Filters.setChecked(!Filters.isChecked(element), element);
         this.onProfessionFilterChange(element);
       };
-    }
+    });
   }
 
   private static setChecked(checked: boolean, element: HTMLElement) {
@@ -69,21 +70,18 @@ export default class Filters {
   }
 
   private updateCheckboxes(professionFilters: string[]) {
-    for (const i of this.checkboxes) {
-      const checkbox = i as HTMLElement;
-      Filters.setChecked(false, checkbox);
-    }
+    this.checkboxes.forEach((checkbox) => Filters.setChecked(false, checkbox));
 
     let allUnchecked = true;
-    for (const filter of professionFilters) {
-      for (const i of this.checkboxes) {
-        const checkbox = i as HTMLElement;
-        if (Filters.getProfessionFilter(checkbox) === filter) {
-          Filters.setChecked(true, checkbox);
-          allUnchecked = false;
-        }
+    this.checkboxes.forEach((checkbox) => {
+      const filter = professionFilters.find(
+        (i) => Filters.getProfessionFilter(checkbox) === i
+      );
+      if (filter) {
+        Filters.setChecked(true, checkbox);
+        allUnchecked = false;
       }
-    }
+    });
     Filters.setChecked(!allUnchecked, this.allCheckbox);
   }
 
@@ -92,18 +90,16 @@ export default class Filters {
     const profession = Filters.getProfessionFilter(element);
 
     if (profession === Filters.selectAllFilter) {
-      for (const i of this.checkboxes) {
-        const checkbox = i as HTMLElement;
-        Filters.setChecked(checked, checkbox);
-      }
+      this.checkboxes.forEach((checkbox) =>
+        Filters.setChecked(checked, checkbox)
+      );
     } else {
       let allUnchecked = true;
-      for (const i of this.checkboxes) {
-        const checkbox = i as HTMLElement;
+      this.checkboxes.forEach((checkbox) => {
         if (Filters.getProfessionFilter(checkbox) !== Filters.selectAllFilter) {
           allUnchecked = allUnchecked && !Filters.isChecked(checkbox);
         }
-      }
+      });
       Filters.setChecked(!allUnchecked, this.allCheckbox);
     }
     localStorage.setItem(
@@ -114,14 +110,13 @@ export default class Filters {
   }
 
   private professionFilters() {
-    const filters = [];
-    for (const i of this.checkboxes) {
-      const checkbox = i as HTMLElement;
+    const filters: string[] = [];
+    this.checkboxes.forEach((checkbox) => {
       const filter = Filters.getProfessionFilter(checkbox);
       if (Filters.isChecked(checkbox) && filter !== Filters.selectAllFilter) {
         filters.push(filter);
       }
-    }
+    });
     return filters;
   }
 
@@ -132,7 +127,7 @@ export default class Filters {
     History.hide();
 
     let lastElement: HTMLElement | undefined;
-    for (const i of this.domData) {
+    this.domData.forEach((i) => {
       if (
         (i.dom.element.innerHTML || "").search(nameFilter) !== -1 &&
         professionFilters.some((value) => value === i.profit.profession)
@@ -143,7 +138,7 @@ export default class Filters {
       } else {
         i.dom.element.style.display = "none";
       }
-    }
+    });
 
     if (lastElement) {
       this.emptyInfo.style.display = "none";

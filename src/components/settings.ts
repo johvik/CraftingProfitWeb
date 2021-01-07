@@ -38,11 +38,11 @@ export default class Settings {
       document.querySelector("#settings .modal-background") as HTMLElement,
       document.querySelector("#settings .modal-close") as HTMLElement,
     ];
-    for (const i of modalCloses) {
+    modalCloses.forEach((i) => {
       i.onclick = () => {
         this.close();
       };
-    }
+    });
 
     document.onkeydown = (event) => {
       if (event.code === "Escape") {

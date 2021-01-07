@@ -313,9 +313,7 @@ export default class History {
     History.container.style.display = "";
 
     const oldParents = document.querySelectorAll(".parent");
-    for (const i of oldParents) {
-      i.classList.remove("parent");
-    }
+    oldParents.forEach((oldParent) => oldParent.classList.remove("parent"));
     // Insert directly below the row of the caller
     const parent = History.findParentRow(caller);
     if (parent && parent.parentElement) {
@@ -340,9 +338,7 @@ export default class History {
 
   static hide() {
     const oldParents = document.querySelectorAll(".parent");
-    for (const i of oldParents) {
-      i.classList.remove("parent");
-    }
+    oldParents.forEach((oldParent) => oldParent.classList.remove("parent"));
     History.container.remove();
     History.lastCaller = undefined;
     History.container.style.display = "none";

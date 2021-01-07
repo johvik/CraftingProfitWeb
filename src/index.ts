@@ -278,10 +278,10 @@ export class CraftingProfit {
 
     const craftsPriceType = this.settings.getCraftsPriceType();
     const costPriceType = this.settings.getCostPriceType();
-    for (const i of this.domData) {
+    this.domData.forEach((i) => {
       i.dom.update(i.profit, craftsPriceType, costPriceType);
       fragment.appendChild(i.dom.element);
-    }
+    });
     recipesBody.appendChild(fragment);
   }
 }

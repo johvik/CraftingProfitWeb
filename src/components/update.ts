@@ -60,14 +60,15 @@ export default class Update {
         const lastUpdate = (await getJson(
           `${apiUrl}/api/auctions/lastUpdate`
         )) as LastUpdate;
-        for (const i of lastUpdate) {
-          if (i.id === GENERATED_CONNECTED_REALM_ID) {
-            const modified = new Date(i.lastModified);
-            self.updateContent(
-              self.lastModified.getTime() < modified.getTime()
-            );
-          }
+
+        const last = lastUpdate.find(
+          (i) => i.id === GENERATED_CONNECTED_REALM_ID
+        );
+        if (last) {
+          const modified = new Date(last.lastModified);
+          self.updateContent(self.lastModified.getTime() < modified.getTime());
         }
+
         self.dataFailed.style.visibility = "hidden";
       } catch (error) {
         console.error("Failed to check for updates", error);
