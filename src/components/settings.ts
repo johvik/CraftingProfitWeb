@@ -45,7 +45,7 @@ export default class Settings {
     }
 
     document.onkeydown = (event) => {
-      if (event.keyCode === 27) {
+      if (event.code === "Escape") {
         // Escape
         this.close();
       }
