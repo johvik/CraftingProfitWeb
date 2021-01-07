@@ -263,16 +263,16 @@ export class CraftingProfit {
     while (this.domData.length > profits.length) {
       this.domData.pop();
     }
-    for (let i = 0; i < profits.length; i += 1) {
+    profits.forEach((profit, i) => {
       if (this.domData.length <= i) {
         this.domData.push({
-          profit: profits[i],
+          profit,
           dom: new ProfitDom(),
         });
       } else {
-        this.domData[i].profit = profits[i];
+        this.domData[i].profit = profit;
       }
-    }
+    });
 
     const fragment = document.createDocumentFragment();
 

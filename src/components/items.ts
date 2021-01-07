@@ -19,8 +19,6 @@ export default class Items {
     }
 
     // Update
-    for (let i = 0; i < this.items.length; i += 1) {
-      this.items[i].update(itemInfos[i]);
-    }
+    this.items.forEach((item, i) => item.update(itemInfos[i]));
   }
 }
