@@ -1,16 +1,8 @@
 import { formatMoney } from "./money";
-import { PriceType, AuctionItem } from "../types";
+import { PriceType, AuctionItem, CItemInfo } from "../types";
 import History from "./history";
 
-export type ItemInfo = {
-  name?: string;
-  icon?: string;
-  quantity: number;
-  auctions: AuctionItem[];
-  vendor: number;
-};
-
-export class Item {
+export default class Item {
   readonly element = document.createElement("span");
 
   private readonly icon = document.createElement("img");
@@ -35,7 +27,7 @@ export class Item {
     return price;
   }
 
-  private static getTitle(item: ItemInfo) {
+  private static getTitle(item: CItemInfo) {
     let title = item.name || "?";
     if (item.vendor) {
       title += `\nVendor:\t${formatMoney(item.vendor)}`;
@@ -101,7 +93,7 @@ export class Item {
     return title;
   }
 
-  update(item: ItemInfo) {
+  update(item: CItemInfo) {
     this.element.title = Item.getTitle(item);
     const icon = item.icon || "inv_misc_questionmark";
     if (icon.startsWith("http")) {

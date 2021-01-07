@@ -1,12 +1,13 @@
+import { CItemInfo } from "../types";
 import { NeverUndefined } from "../utils";
-import { Item, ItemInfo } from "./item";
+import Item from "./item";
 
 export default class Items {
   readonly element = document.createElement("span");
 
   private readonly items: Item[] = [];
 
-  update(itemInfos: ItemInfo[]) {
+  update(itemInfos: CItemInfo[]) {
     // Reuse old elemets and add new ones if needed
     while (this.items.length > itemInfos.length) {
       const item = NeverUndefined(this.items.pop());

@@ -1,6 +1,6 @@
-import { DomData } from "../index";
 import { NeverNull } from "../utils";
 import History from "./history";
+import { DomData } from "./profit";
 
 export default class Filters {
   private readonly domData: DomData[];

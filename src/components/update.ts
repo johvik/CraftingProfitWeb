@@ -1,7 +1,6 @@
 import { NeverNull, getJson } from "../utils";
-import { LastUpdate } from "../types";
+import { CraftingProfitInterface, LastUpdate } from "../types";
 import { API_URL, GENERATED_CONNECTED_REALM_ID } from "../constants";
-import { CraftingProfit } from "../index";
 import Settings from "./settings";
 
 export default class Update {
@@ -19,7 +18,7 @@ export default class Update {
 
   private readonly settings: Settings;
 
-  constructor(craftingProfit: CraftingProfit, settings: Settings) {
+  constructor(craftingProfit: CraftingProfitInterface, settings: Settings) {
     this.settings = settings;
     this.refresh.onclick = () => {
       this.refresh.classList.add("is-loading");

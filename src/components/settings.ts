@@ -1,6 +1,5 @@
 import { NeverNull } from "../utils";
-import { PriceType } from "../types";
-import { CraftingProfit } from "../index";
+import { CraftingProfitInterface, PriceType } from "../types";
 import History from "./history";
 
 export default class Settings {
@@ -28,7 +27,7 @@ export default class Settings {
 
   private readonly automaticRefreshKey = "automatic-refresh";
 
-  constructor(craftingProfit: CraftingProfit) {
+  constructor(craftingProfit: CraftingProfitInterface) {
     const openSettings = NeverNull(document.getElementById("open-settings"));
     openSettings.onclick = () => {
       this.settings.classList.add("is-active");
@@ -99,7 +98,7 @@ export default class Settings {
     return "lowest";
   }
 
-  private onPriceTypeChange(craftingProfit: CraftingProfit) {
+  private onPriceTypeChange(craftingProfit: CraftingProfitInterface) {
     const crafts = Settings.getPriceType(this.craftsPriceType.value);
     const cost = Settings.getPriceType(this.costPriceType.value);
     localStorage.setItem(this.craftsTypeKey, crafts);

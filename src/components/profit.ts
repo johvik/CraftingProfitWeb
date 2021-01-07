@@ -1,10 +1,15 @@
 import { Money, formatMoney } from "./money";
-import { Profit, CostInfo, auctionProfit, AuctionSum } from "../index";
-import { Item, ItemInfo } from "./item";
+import Item from "./item";
 import Items from "./items";
-import { PriceType } from "../types";
+import { AuctionSum, CItemInfo, CostInfo, PriceType, Profit } from "../types";
+import auctionProfit from "../auctionProfit";
 
-export default class ProfitDom {
+export type DomData = {
+  profit: Profit;
+  dom: ProfitDom;
+};
+
+export class ProfitDom {
   readonly element = document.createElement("tr");
 
   private readonly recipe = document.createElement("a");
@@ -47,7 +52,7 @@ export default class ProfitDom {
   private static craftsItemInfo(
     profit: Profit,
     useNameAndIcon: boolean
-  ): ItemInfo {
+  ): CItemInfo {
     if (profit.crafts) {
       const { item } = profit.crafts;
       return {
@@ -67,7 +72,7 @@ export default class ProfitDom {
     };
   }
 
-  private static itemInfo(costInfo: CostInfo): ItemInfo {
+  private static itemInfo(costInfo: CostInfo): CItemInfo {
     const { item } = costInfo;
     return {
       name: item ? item.name : undefined,
@@ -78,7 +83,7 @@ export default class ProfitDom {
     };
   }
 
-  private static itemInfos(costInfos: CostInfo[]): ItemInfo[] {
+  private static itemInfos(costInfos: CostInfo[]): CItemInfo[] {
     return costInfos.map(ProfitDom.itemInfo);
   }
 

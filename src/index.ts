@@ -1,4 +1,4 @@
-import ProfitDom from "./components/profit";
+import { DomData, ProfitDom } from "./components/profit";
 import {
   AuctionInfo,
   DataInfo,
@@ -7,6 +7,10 @@ import {
   ItemInfo,
   PriceType,
   AuctionItem,
+  CostInfo,
+  Cost,
+  Profit,
+  CraftingProfitInterface,
 } from "./types";
 import { getJson, NeverNull } from "./utils";
 import Update from "./components/update";
@@ -14,12 +18,7 @@ import { API_URL, GENERATED_CONNECTED_REALM_ID } from "./constants";
 import Filters from "./components/filters";
 import Settings from "./components/settings";
 import History from "./components/history";
-
-export type CostInfo = {
-  item?: ItemInfo;
-  auctions: AuctionItem[];
-  quantity: number;
-};
+import auctionProfit from "./auctionProfit";
 
 function findCostInfo(
   crafts: RecipeItem,
@@ -34,22 +33,6 @@ function findCostInfo(
     quantity: crafts.quantity,
   };
 }
-
-export type AuctionSum = {
-  lowest: number;
-  farOut: number;
-  outlier: number;
-  mean: number;
-  firstQuartile: number;
-  secondQuartile: number;
-  thirdQuartile: number;
-};
-
-type Cost = {
-  auctionSum: AuctionSum;
-  reagents: CostInfo[];
-  unknown: CostInfo[];
-};
 
 function calculateCost(
   costInfo: CostInfo,
@@ -121,35 +104,6 @@ function findCost(
   );
 }
 
-export type Profit = {
-  id: number;
-  name: string;
-  icon: string;
-  profession: string;
-  crafts?: CostInfo;
-  cost: Cost;
-};
-
-export function auctionProfit(
-  profit: Profit,
-  craftsPriceType: PriceType,
-  costPriceType: PriceType
-) {
-  return (
-    (profit.crafts
-      ? Math.floor(
-          (profit.crafts.auctions.length > 0
-            ? profit.crafts.auctions[profit.crafts.auctions.length - 1][
-                craftsPriceType
-              ]
-            : 0) *
-            profit.crafts.quantity *
-            0.95
-        )
-      : 0) - profit.cost.auctionSum[costPriceType]
-  );
-}
-
 function calculateProfit(
   id: number,
   recipe: RecipeInfo,
@@ -208,12 +162,7 @@ function calculateProfits(
   return profits;
 }
 
-export type DomData = {
-  profit: Profit;
-  dom: ProfitDom;
-};
-
-export class CraftingProfit {
+export default class CraftingProfit implements CraftingProfitInterface {
   private readonly domData: DomData[] = [];
 
   private readonly settings = new Settings(this);

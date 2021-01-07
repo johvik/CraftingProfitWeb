@@ -4,10 +4,9 @@ import {
   ChartData,
   ChartLegendLabelItem,
 } from "chart.js";
-import { ItemInfo } from "./item";
 import { NeverUndefined, NeverNull } from "../utils";
 import { formatMoney } from "./money";
-import { AuctionItem, PriceType } from "../types";
+import { AuctionItem, CItemInfo, PriceType } from "../types";
 
 function toPoints(auctions: AuctionItem[], priceType: PriceType) {
   return auctions.map((value) => ({
@@ -53,7 +52,7 @@ export default class History {
 
   private static chart: Chart | undefined;
 
-  static show(item: ItemInfo, caller: HTMLElement) {
+  static show(item: CItemInfo, caller: HTMLElement) {
     if (caller === History.lastCaller) {
       History.hide();
       return;
