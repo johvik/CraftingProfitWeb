@@ -1,24 +1,24 @@
+import auctionProfit from "./auctionProfit";
+import Filters from "./components/filters";
+import History from "./components/history";
 import { DomData, ProfitDom } from "./components/profit";
-import {
-  AuctionInfo,
-  DataInfo,
-  RecipeInfo,
-  RecipeItem,
-  ItemInfo,
-  PriceType,
-  AuctionItem,
-  CostInfo,
-  Cost,
-  Profit,
-  CraftingProfitInterface,
-} from "./types";
-import { getJson, NeverNull } from "./utils";
+import Settings from "./components/settings";
 import Update from "./components/update";
 import { API_URL, GENERATED_CONNECTED_REALM_ID } from "./constants";
-import Filters from "./components/filters";
-import Settings from "./components/settings";
-import History from "./components/history";
-import auctionProfit from "./auctionProfit";
+import {
+  AuctionInfo,
+  AuctionItem,
+  Cost,
+  CostInfo,
+  CraftingProfitInterface,
+  DataInfo,
+  ItemInfo,
+  PriceType,
+  Profit,
+  RecipeInfo,
+  RecipeItem,
+} from "./types";
+import { getJson, NeverNull } from "./utils";
 
 function findCostInfo(
   crafts: RecipeItem,

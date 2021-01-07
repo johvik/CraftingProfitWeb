@@ -1,6 +1,6 @@
-import { NeverNull, getJson } from "../utils";
-import { CraftingProfitInterface, LastUpdate } from "../types";
 import { API_URL, GENERATED_CONNECTED_REALM_ID } from "../constants";
+import { CraftingProfitInterface, LastUpdate } from "../types";
+import { getJson, NeverNull } from "../utils";
 import Settings from "./settings";
 
 export default class Update {

@@ -1,5 +1,5 @@
-import { NeverNull } from "../utils";
 import { CraftingProfitInterface, PriceType } from "../types";
+import { NeverNull } from "../utils";
 import History from "./history";
 
 export default class Settings {

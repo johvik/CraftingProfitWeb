@@ -1,6 +1,6 @@
-import { formatMoney } from "./money";
-import { PriceType, AuctionItem, CItemInfo } from "../types";
+import { AuctionItem, CItemInfo, PriceType } from "../types";
 import History from "./history";
+import { formatMoney } from "./money";
 
 export default class Item {
   readonly element = document.createElement("span");
