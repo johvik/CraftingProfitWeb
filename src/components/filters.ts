@@ -45,10 +45,9 @@ export default class Filters {
     };
 
     this.checkboxes.forEach((checkbox) => {
-      checkbox.onclick = (event: Event) => {
-        const element = event.srcElement as HTMLElement;
-        Filters.setChecked(!Filters.isChecked(element), element);
-        this.onProfessionFilterChange(element);
+      checkbox.onclick = () => {
+        Filters.setChecked(!Filters.isChecked(checkbox), checkbox);
+        this.onProfessionFilterChange(checkbox);
       };
     });
   }
