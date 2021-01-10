@@ -101,3 +101,5 @@ export type Profit = {
 export type CraftingProfitInterface = {
   updateData(): void;
 };
+
+export type ConnectedRealms = string[];

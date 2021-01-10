@@ -8,6 +8,7 @@ import { API_URL, GENERATED_CONNECTED_REALM_ID } from "./constants";
 import {
   AuctionInfo,
   AuctionItem,
+  ConnectedRealms,
   Cost,
   CostInfo,
   CraftingProfitInterface,
@@ -180,6 +181,9 @@ export default class CraftingProfit implements CraftingProfitInterface {
           `${apiUrl}/api/auctions/${GENERATED_CONNECTED_REALM_ID}`
         )) as AuctionInfo;
         const data = (await getJson(`${apiUrl}/api/data`)) as DataInfo;
+        const connectedRealms = (await getJson(
+          `${apiUrl}/api/connectedRealms/${GENERATED_CONNECTED_REALM_ID}`
+        )) as ConnectedRealms;
         const items = new Map(data.items);
         const recipes = new Map(data.recipes);
         const craftsPriceType: PriceType = self.settings.getCraftsPriceType();
@@ -193,6 +197,7 @@ export default class CraftingProfit implements CraftingProfitInterface {
         );
         self.update.success(new Date(auctions.lastModified));
         self.updateRecipes(profits);
+        CraftingProfit.updateConnectedRealms(connectedRealms);
         self.filters.apply();
       } catch (error) {
         console.error("Failed to get data", error);
@@ -232,6 +237,26 @@ export default class CraftingProfit implements CraftingProfitInterface {
       fragment.appendChild(i.dom.element);
     });
     recipesBody.appendChild(fragment);
+  }
+
+  private static updateConnectedRealms(connectedRealms: ConnectedRealms) {
+    connectedRealms.sort();
+
+    const element = NeverNull(document.getElementById("connected-realms"));
+    if (connectedRealms.length !== 0) {
+      const [firstRealm] = connectedRealms.splice(0, 1);
+
+      // Do not display the title if there are no reaming elements in the array
+      if (connectedRealms.length !== 0) {
+        element.title = connectedRealms.join("\n");
+      } else {
+        element.removeAttribute("title");
+      }
+      element.textContent = firstRealm;
+    } else {
+      element.removeAttribute("title");
+      element.textContent = "";
+    }
   }
 }
 
